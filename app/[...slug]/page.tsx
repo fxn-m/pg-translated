@@ -5,9 +5,10 @@ import html from "remark-html"
 import { remark } from "remark"
 
 export default async function Page({ params }: { params: { slug: string[] } }) {
-  const [articleTitle, lang] = params.slug
+  const [rawArticleTitle, lang] = params.slug
 
-  const article = await db.select().from(essays).where(eq(essays.title, "Founder Mode.md"))
+  const articleTitle = rawArticleTitle.replace(/%20/g, " ")
+  const article = await db.select().from(essays).where(eq(essays.title, articleTitle))
 
   const content = article[0].content
   const parsedContent = await remark().use(html).process(content)
