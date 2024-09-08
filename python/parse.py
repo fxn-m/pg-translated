@@ -64,6 +64,8 @@ def convert_html_to_markdown(html_content: str) -> str:
 
     markdown_content = re.sub(r'\n{3,}', '\n\n', markdown_content).strip()
 
+    markdown_content = re.sub(r'{" "}', ' ', markdown_content)
+
     return markdown_content
 
 for htmlFile in os.listdir('essaysHTML'):

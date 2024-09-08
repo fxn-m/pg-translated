@@ -1,6 +1,6 @@
 {
-  "id": "a98b784c-4cc9-4ad8-aa3c-07a21b0423a8",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "537a3398-0f1a-47ff-875a-39f99ed175a9",
+  "prevId": "a98b784c-4cc9-4ad8-aa3c-07a21b0423a8",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -18,13 +18,13 @@
           "name": "title",
           "type": "varchar",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "content": {
           "name": "content",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "created_at": {
           "name": "created_at",
@@ -44,7 +44,7 @@
           "type": "language_enum",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {
