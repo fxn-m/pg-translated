@@ -7,7 +7,7 @@ CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 def scrapeEssay(link, title):
     if not 'http' in link:
         page = urllib.request.urlopen('http://www.paulgraham.com/' + link).read()
-        soup = BeautifulSoup(page, 'html5lib')
+        soup = BeautifulSoup(page, 'html.parser')
         soup.prettify()
     else:
         page = urllib.request.urlopen(link).read()
@@ -39,49 +39,42 @@ def scrapeEssay(link, title):
     
     return essay
 
-# page = urllib.request.urlopen('http://www.paulgraham.com/articles.html').read()
-# soup = BeautifulSoup(page, 'html5lib')
-# soup.prettify()
-# intermediate = soup.findAll('table', {'width': '435'})
+page = urllib.request.urlopen('http://www.paulgraham.com/articles.html').read()
+soup = BeautifulSoup(page, 'html.parser')
+soup.prettify()
+articles = soup.findAll('table', {'width': '435'})
 
-# # save intermediate to file
-# with open('intermediate.html', 'w') as file:
-#     file.write(str(intermediate))
-#     print("file written")
+# save articles to file
+with open('articles.html', 'w') as file:
+    file.write(str(articles))
+    print("file written")
 
-# read intermediate from file
-with open('intermediate.html', 'r') as file:
-    intermediate = file.read()
+# read articles from file
+with open('articles.html', 'r') as file:
+    articles = file.read()
 
-soup = BeautifulSoup(intermediate, 'html5lib')
+soup = BeautifulSoup(articles, 'html.parser')
 soup.prettify()
 
 links = soup.findAll('a')
-print("len(links)", len(links)) 
 
-print("links[3]", links[3])
-print("links[3].attrs", links[3].attrs)
-print("links[3].text", links[3].text)   
-print("links[3]['href']", links[3]['href'])
+for i, link in enumerate(links):
+     # skip essays that have already been scraped
+    if os.path.exists(CURRENT_DIR + '/essays/' + link.text + '.html'):
+        print("%d file already exists: %s" % (i, link.text))
+        continue
 
-essay = scrapeEssay(links[3]['href'], links[3].text)
+    title = link.text
+ 
+    if '/' in link.text:
+        title = link.text.replace('/', '-')
 
-# write essay to file
-with open('essay.html', 'w') as file:
-    for p in essay:
-        file.write(p)
-        file.write("\n\n")
-    print("file written")
 
-# # # read essay from file
-# with open('essay.html', 'r') as file:
-#     essay = file.read()
+    essay = scrapeEssay(link['href'], link.text)
 
-# soup = BeautifulSoup(essay, 'html5lib')
-# soup.prettify()
-# print(soup.get_text())
 
-# sections = []
-# for link in links:
-#     # sections.append(addSection(link['href'], link.text))
-#     print(link['href'])
+    with open(CURRENT_DIR + '/essays/' + title + '.html', 'w') as file:
+        for p in essay:
+            file.write(p)
+            file.write("\n\n")
+        print("file written: %s" % link.text)
