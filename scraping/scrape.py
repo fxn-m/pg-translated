@@ -1,18 +1,19 @@
 import urllib.request
 from bs4 import BeautifulSoup
+import os
+
+CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 def scrapeEssay(link, title):
     if not 'http' in link:
         page = urllib.request.urlopen('http://www.paulgraham.com/' + link).read()
-        soup = BeautifulSoup(page, 'html.parser')
+        soup = BeautifulSoup(page, 'html5lib')
         soup.prettify()
     else:
         page = urllib.request.urlopen(link).read()
-
-    print(page)
         
     try:
-        print("Scraping... %s" % title)
+        print("\nScraping... %s" % title)
         essay = []
 
         if not 'http' in link:
@@ -27,7 +28,6 @@ def scrapeEssay(link, title):
             for p in content.split("<br /><br />"):
                 essay.append(p)
 
-
             # exception for Subject: Airbnb
             for pre in soup.findAll('pre'):
                 essay.append(str(pre))
@@ -39,9 +39,8 @@ def scrapeEssay(link, title):
     
     return essay
 
-
 # page = urllib.request.urlopen('http://www.paulgraham.com/articles.html').read()
-# soup = BeautifulSoup(page, 'html.parser')
+# soup = BeautifulSoup(page, 'html5lib')
 # soup.prettify()
 # intermediate = soup.findAll('table', {'width': '435'})
 
@@ -54,11 +53,11 @@ def scrapeEssay(link, title):
 with open('intermediate.html', 'r') as file:
     intermediate = file.read()
 
-soup = BeautifulSoup(intermediate, 'html.parser')
+soup = BeautifulSoup(intermediate, 'html5lib')
 soup.prettify()
 
 links = soup.findAll('a')
-print("\n\nlen(links)", len(links)) 
+print("len(links)", len(links)) 
 
 print("links[3]", links[3])
 print("links[3].attrs", links[3].attrs)
@@ -74,6 +73,13 @@ with open('essay.html', 'w') as file:
         file.write("\n\n")
     print("file written")
 
+# # # read essay from file
+# with open('essay.html', 'r') as file:
+#     essay = file.read()
+
+# soup = BeautifulSoup(essay, 'html5lib')
+# soup.prettify()
+# print(soup.get_text())
 
 # sections = []
 # for link in links:
