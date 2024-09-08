@@ -43,3 +43,6 @@ next-env.d.ts
 
 # essays
 /python/essays*
+
+# environment
+/.env

@@ -70,7 +70,7 @@ for htmlFile in os.listdir('essaysHTML'):
     with open(f'essaysHTML/{htmlFile}', 'r') as file:
         html_content = file.read()
         markdown = convert_html_to_markdown(html_content)
-        with open(f'essaysMD/{htmlFile.replace(".html", ".md")}', 'w') as file:
+        with open(f'essaysMDEnglish/{htmlFile.replace(".html", ".md")}', 'w') as file:
             file.write(markdown)
 
 
