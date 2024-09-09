@@ -1,6 +1,8 @@
 import "./globals.css"
 
 import { Inter } from "next/font/google"
+import LanguageSelector from "@/components/LanguageSelector"
+import Link from "next/link"
 import type { Metadata } from "next"
 import localFont from "next/font/local"
 
@@ -39,7 +41,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} ${verdana.variable} ${inter.variable} antialiased`}>{children}</body>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${verdana.variable} ${inter.variable} flex min-h-screen flex-col gap-4 p-8 antialiased`}>
+        <div className="flex flex-row justify-between">
+          <Link href="/">Articles</Link>
+          <LanguageSelector />
+        </div>
+        {children}
+      </body>
     </html>
   )
 }
