@@ -1,9 +1,8 @@
 import { index, integer, pgEnum, pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core"
 
-// Enum for supported languages
-export const languageEnum = pgEnum("language_enum", ["English", "French", "Spanish", "German"])
+export const languageEnum = pgEnum("language_enum", ["english", "french", "spanish", "german"])
+export const supportedLanguages = languageEnum.enumValues
 
-// The essays table with language enum
 export const essays = pgTable(
   "essays",
   {
