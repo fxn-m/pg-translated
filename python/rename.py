@@ -1,3 +1,7 @@
+'''
+Rename all files in the essaysHTML directory to the href attribute of the corresponding link in the articles.html file
+'''
+
 from bs4 import BeautifulSoup
 import os
 

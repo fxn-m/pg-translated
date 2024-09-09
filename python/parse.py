@@ -31,6 +31,7 @@ def convert_html_to_markdown(html_content: str) -> str:
             # If it's a local HTML file, convert to a full URL
             elif href.endswith('.html') and not href.startswith('http'):
                 href = f'https://paulgraham.com/{href}'
+                a_tag.replace_with(f'[{text}]({href})')
 
             else:
                 # Regular links stay as-is
@@ -68,11 +69,17 @@ def convert_html_to_markdown(html_content: str) -> str:
 
     return markdown_content
 
-for htmlFile in os.listdir('essaysHTML'):
-    with open(f'essaysHTML/{htmlFile}', 'r') as file:
+def convert_and_save(html_file_path, md_file_path):
+    with open(html_file_path, 'r') as file:
         html_content = file.read()
         markdown = convert_html_to_markdown(html_content)
-        with open(f'essaysMDEnglish/{htmlFile.replace(".html", ".md")}', 'w') as file:
+        with open(md_file_path, 'w') as file:
             file.write(markdown)
 
+TEST_FILE = None
 
+if TEST_FILE:
+    convert_and_save(f'essaysHTML/{TEST_FILE}', f'essaysMDEnglish/{TEST_FILE.replace(".html", ".md")}')
+else:
+    for htmlFile in os.listdir('essaysHTML'):
+        convert_and_save(f'essaysHTML/{htmlFile}', f'essaysMDEnglish/{htmlFile.replace(".html", ".md")}')
