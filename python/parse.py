@@ -16,8 +16,8 @@ def convert_html_to_markdown(html_content: str) -> str:
         # Handle footnotes with the 'name' attribute
         if 'name' in a_tag.attrs:
             name = a_tag['name']
-            footnote_number = name[1]
-            a_tag.replace_with(f'###### {footnote_number}')
+            num = re.sub(r'\D', '', name)
+            a_tag.replace_with(f'<a id="{name}" class="footnote"></a>{num}')
         
         # Handle links with the 'href' attribute
         elif 'href' in a_tag.attrs:
@@ -26,7 +26,8 @@ def convert_html_to_markdown(html_content: str) -> str:
 
             # If it's an internal link (starts with '#'), convert to a Markdown link
             if href.startswith('#'):
-                a_tag.replace_with(f'[{href[2]}](#{href[2]})')
+                num = re.sub(r'\D', '', href)
+                a_tag.replace_with(f'[{num}]({href})')
             
             # If it's a local HTML file, convert to a full URL
             elif href.endswith('.html') and not href.startswith('http'):
@@ -58,13 +59,12 @@ def convert_html_to_markdown(html_content: str) -> str:
     if markdown_content.startswith(';'):
         markdown_content = markdown_content[1:]
 
-    markdown_content = re.sub(r'\[\s*(###### \d+)\s*\]', r'\1\n', markdown_content)
-
+    # Remove extra whitespace
     markdown_content = re.sub(r'\n[ \t]+', '\n', markdown_content)
     markdown_content = re.sub(r'[ \t]+\n', '\n', markdown_content)
-
+    # Remove extra newlines
     markdown_content = re.sub(r'\n{3,}', '\n\n', markdown_content).strip()
-
+    # Remove extra whitespace around links
     markdown_content = re.sub(r'{" "}', ' ', markdown_content)
 
     return markdown_content
