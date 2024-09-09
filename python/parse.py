@@ -79,7 +79,7 @@ def convert_and_save(html_file_path, md_file_path):
 TEST_FILE = None
 
 if TEST_FILE:
-    convert_and_save(f'essaysHTML/{TEST_FILE}', f'essaysMDEnglish/{TEST_FILE.replace(".html", ".md")}')
+    convert_and_save(f'essaysHTML/{TEST_FILE}', f'essaysMDenglish/{TEST_FILE.replace(".html", ".md")}')
 else:
     for htmlFile in os.listdir('essaysHTML'):
-        convert_and_save(f'essaysHTML/{htmlFile}', f'essaysMDEnglish/{htmlFile.replace(".html", ".md")}')
+        convert_and_save(f'essaysHTML/{htmlFile}', f'essaysMDenglish/{htmlFile.replace(".html", ".md")}')

@@ -47,7 +47,7 @@ articles = soup.findAll('table', {'width': '435'})
 # save articles to file
 with open('articles.html', 'w') as file:
     file.write(str(articles))
-    print("file written")
+    print("articles.html written")
 
 # read articles from file
 with open('articles.html', 'r') as file:
