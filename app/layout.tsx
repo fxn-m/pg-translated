@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"
 import LanguageSelector from "@/components/LanguageSelector"
 import Link from "next/link"
 import type { Metadata } from "next"
+import ModelSelector from "@/components/ModelSelector"
 import localFont from "next/font/local"
 
 const geistSans = localFont({
@@ -43,8 +44,14 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} ${verdana.variable} ${inter.variable} flex min-h-screen flex-col gap-4 p-8 antialiased`}>
         <div className="flex flex-row justify-between">
-          <Link href="/">Articles</Link>
-          <LanguageSelector />
+          <div className="flex flex-row gap-4">
+            <Link href="/">Home</Link>
+            <Link href="/essays">Essays</Link>
+          </div>
+          <div className="flex flex-row gap-6">
+            <ModelSelector />
+            <LanguageSelector />
+          </div>
         </div>
         {children}
       </body>

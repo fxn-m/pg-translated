@@ -7,15 +7,9 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useSearchParams } from "next/navigation"
 
-const languages = [
-  { code: "english", flag: "🇬🇧" },
-  { code: "french", flag: "🇫🇷" },
-  { code: "spanish", flag: "🇪🇸" },
-  { code: "german", flag: "🇩🇪" }
-  // { code: "Request a language!", flag: "💬" }
-]
+const models = ["gpt-4o-mini"]
 
-export default function LanguageSelector() {
+export default function ModelSelector() {
   const [isOpen, setIsOpen] = useState(false)
 
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -23,7 +17,7 @@ export default function LanguageSelector() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const [essayTitle, lang] = pathname.split("/").filter(Boolean)
+  const [essayTitle, lang, model] = pathname.split("/").filter(Boolean)
   const currentLang = lang || searchParams.get("lang") || "english"
 
   useEffect(() => {
@@ -48,13 +42,13 @@ export default function LanguageSelector() {
       <div>
         <button
           type="button"
-          className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+          className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
           id="language-menu-button"
           aria-expanded={isOpen}
           aria-haspopup="true"
           onClick={() => setIsOpen(!isOpen)}
         >
-          {languages.find((lang) => lang.code === currentLang)?.flag || "🌐"}
+          {model || "gpt-4o-mini"}
           <ChevronDown className={`-mr-1 h-5 w-5 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`} aria-hidden="true" />
         </button>
       </div>
@@ -67,16 +61,16 @@ export default function LanguageSelector() {
           tabIndex={-1}
         >
           <div className="py-1" role="none">
-            {languages.map((lang) => (
+            {models.map((model) => (
               <Link
-                key={lang.code}
-                href={`/${essayTitle}${essayTitle === "essays" ? "?lang=" + lang.code : `/${lang.code}`}`}
+                key={model}
+                href={`/${essayTitle}/${currentLang}/${model}`}
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 role="menuitem"
                 tabIndex={-1}
                 onClick={() => setIsOpen(false)}
               >
-                {lang.flag} &nbsp; {lang.code.charAt(0).toUpperCase() + lang.code.slice(1)}
+                {model}
               </Link>
             ))}
           </div>

@@ -2,6 +2,7 @@ import { index, integer, pgEnum, pgTable, serial, text, timestamp, varchar } fro
 
 export const languageEnum = pgEnum("language_enum", ["english", "french", "spanish", "german"])
 export const supportedLanguages = languageEnum.enumValues
+export type SupportedLanguage = (typeof supportedLanguages)[number] // ! BAD: This is a hack to get the type of the enum values
 
 export const essays = pgTable(
   "essays",
@@ -9,9 +10,11 @@ export const essays = pgTable(
     id: serial("id").primaryKey(),
     title: varchar("title").notNull(),
     content: text("content").notNull(),
+    date_written: timestamp("date_written"),
+    language: languageEnum("language").notNull(),
+    translationModel: varchar("translation_model").default("gpt-4o-mini"),
     created_at: timestamp("created_at").defaultNow(),
-    likes: integer("likes"),
-    language: languageEnum("language").notNull()
+    likes: integer("likes").default(0)
   },
   (table) => {
     return {
