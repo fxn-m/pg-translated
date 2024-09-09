@@ -5,6 +5,7 @@ import LanguageSelector from "@/components/LanguageSelector"
 import Link from "next/link"
 import type { Metadata } from "next"
 import ModelSelector from "@/components/ModelSelector"
+import { Suspense } from "react"
 import localFont from "next/font/local"
 
 const geistSans = localFont({
@@ -49,8 +50,10 @@ export default function RootLayout({
             <Link href="/essays">Essays</Link>
           </div>
           <div className="flex flex-row gap-6">
-            <ModelSelector />
-            <LanguageSelector />
+            <Suspense fallback={<div>Loading...</div>}>
+              <ModelSelector />
+              <LanguageSelector />
+            </Suspense>
           </div>
         </div>
         {children}
