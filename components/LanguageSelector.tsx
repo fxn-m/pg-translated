@@ -23,7 +23,7 @@ export default function LanguageSelector() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const [essayTitle, lang] = pathname.split("/").filter(Boolean)
+  const [shortTitle, lang] = pathname.split("/").filter(Boolean)
   const currentLang = lang || searchParams.get("lang") || "english"
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function LanguageSelector() {
     }
   }, [])
 
-  if ((!lang && essayTitle !== "essays") || !essayTitle) {
+  if ((!lang && shortTitle !== "essays") || !shortTitle) {
     return null
   }
 
@@ -70,7 +70,7 @@ export default function LanguageSelector() {
             {languages.map((lang) => (
               <Link
                 key={lang.code}
-                href={`/${essayTitle}${essayTitle === "essays" ? "?lang=" + lang.code : `/${lang.code}`}`}
+                href={`/${shortTitle}${shortTitle === "essays" ? "?lang=" + lang.code : `/${lang.code}`}`}
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 role="menuitem"
                 tabIndex={-1}

@@ -1,0 +1,1 @@
+ALTER TABLE "essays" ADD COLUMN "short_title" varchar NOT NULL;

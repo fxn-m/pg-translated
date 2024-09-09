@@ -1,4 +1,4 @@
-import { index, integer, pgEnum, pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core"
+import { date, index, integer, pgEnum, pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core"
 
 export const languageEnum = pgEnum("language_enum", ["english", "french", "spanish", "german"])
 export const supportedLanguages = languageEnum.enumValues
@@ -9,8 +9,9 @@ export const essays = pgTable(
   {
     id: serial("id").primaryKey(),
     title: varchar("title").notNull(),
+    short_title: varchar("short_title").notNull(),
     content: text("content").notNull(),
-    date_written: timestamp("date_written"),
+    date_written: date("date_written"),
     language: languageEnum("language").notNull(),
     translationModel: varchar("translation_model").default("gpt-4o-mini"),
     created_at: timestamp("created_at").defaultNow(),

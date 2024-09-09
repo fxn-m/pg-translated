@@ -17,7 +17,7 @@ export default function ModelSelector() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const [essayTitle, lang, model] = pathname.split("/").filter(Boolean)
+  const [shortTitle, lang, model] = pathname.split("/").filter(Boolean)
   const currentLang = lang || searchParams.get("lang") || "english"
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export default function ModelSelector() {
     }
   }, [])
 
-  if ((!lang && essayTitle !== "essays") || !essayTitle) {
+  if ((!lang && shortTitle !== "essays") || !shortTitle) {
     return null
   }
 
@@ -64,7 +64,7 @@ export default function ModelSelector() {
             {models.map((model) => (
               <Link
                 key={model}
-                href={`/${essayTitle}/${currentLang}/${model}`}
+                href={`/${shortTitle}/${currentLang}/${model}`}
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 role="menuitem"
                 tabIndex={-1}

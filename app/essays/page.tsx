@@ -21,7 +21,7 @@ export default async function Page({ searchParams }: { searchParams: Record<stri
       <main className="flex flex-col">
         {essayArray.map((essay) => (
           <div key={essay.id}>
-            <Link className="text-blue-600 visited:text-gray-400" href={`/${essay.title}/${language}`}>
+            <Link className="text-blue-600 visited:text-gray-400" href={`/${essay.short_title}/${language}`}>
               {essay.title}
             </Link>
           </div>

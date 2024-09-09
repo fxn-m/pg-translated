@@ -11,7 +11,7 @@ import remarkRehype from "remark-rehype"
 import { type SupportedLanguage, supportedLanguages } from "@/db/schema"
 
 export default async function Page({ params }: { params: { slug: string[] } }) {
-  const [rawEssayTitle, lang, model = "gpt-4o-mini"] = params.slug
+  const [rawShortTitle, lang, model = "gpt-4o-mini"] = params.slug
 
   const language = lang.toLowerCase() as SupportedLanguage // ! BAD: This is a hack to get the type of the enum values
 
@@ -19,11 +19,11 @@ export default async function Page({ params }: { params: { slug: string[] } }) {
     return <div>Invalid language</div>
   }
 
-  const essayTitle = rawEssayTitle.replace(/%20/g, " ")
+  const shortTitle = rawShortTitle.replace(/%20/g, " ")
   const essayArray = await db
     .select()
     .from(essays)
-    .where(and(eq(essays.translationModel, model), and(eq(essays.title, essayTitle), eq(essays.language, language))))
+    .where(and(eq(essays.translationModel, model), and(eq(essays.short_title, shortTitle), eq(essays.language, language))))
 
   const parsedContent = await remark()
     .use(gfm)
@@ -37,7 +37,7 @@ export default async function Page({ params }: { params: { slug: string[] } }) {
   return (
     <div className="min-h-screen items-center justify-items-center font-geistSans">
       <main className="row-start-2 flex flex-col items-start gap-8 text-sm sm:items-start">
-        <h1 className="text-xl">{essayTitle.toUpperCase()}</h1>
+        <h1 className="text-xl">{shortTitle.toUpperCase()}</h1>
         <div className="max-w-2xl space-y-4 font-verdana md:w-2/3 lg:w-1/2" dangerouslySetInnerHTML={{ __html: contentHtml }} />
       </main>
     </div>
