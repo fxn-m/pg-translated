@@ -16,12 +16,12 @@ export default async function Page({ params }: { params: { slug: string[] } }) {
 
   return (
     <div className="min-h-screen items-center justify-items-center gap-16 p-8 pb-20 font-geistSans sm:p-20">
-      <main className="row-start-2 flex flex-col items-start gap-8 sm:items-start">
+      <main className="row-start-2 flex flex-col items-start gap-8 text-sm sm:items-start">
         <h1 className="text-xl">{articleTitle.toLocaleUpperCase()}</h1>
         <p>
           paulgraham-translated.com/{articleTitle} in {lang}
         </p>
-        <div className="w-1/3 space-y-4 font-verdana" dangerouslySetInnerHTML={{ __html: contentHtml }} />
+        <div className="max-w-2xl space-y-4 font-verdana md:w-2/3 lg:w-1/2" dangerouslySetInnerHTML={{ __html: contentHtml }} />
       </main>
     </div>
   )
