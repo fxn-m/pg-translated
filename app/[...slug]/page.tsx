@@ -1,8 +1,12 @@
 import { db } from "@/db"
 import { eq } from "drizzle-orm"
 import { essays } from "@/db/schema"
-import html from "remark-html"
+import gfm from "remark-gfm"
+import rehypeRaw from "rehype-raw"
+import rehypeStringify from "rehype-stringify"
 import { remark } from "remark"
+import remarkParse from "remark-parse"
+import remarkRehype from "remark-rehype"
 
 export default async function Page({ params }: { params: { slug: string[] } }) {
   const [rawArticleTitle, lang] = params.slug
@@ -10,8 +14,13 @@ export default async function Page({ params }: { params: { slug: string[] } }) {
   const articleTitle = rawArticleTitle.replace(/%20/g, " ")
   const article = await db.select().from(essays).where(eq(essays.title, articleTitle))
 
-  const content = article[0].content
-  const parsedContent = await remark().use(html).process(content)
+  const parsedContent = await remark()
+    .use(gfm)
+    .use(remarkParse)
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeRaw)
+    .use(rehypeStringify)
+    .process(article[0].content)
   const contentHtml = parsedContent.toString()
 
   return (

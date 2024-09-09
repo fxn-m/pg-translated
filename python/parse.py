@@ -17,7 +17,7 @@ def convert_html_to_markdown(html_content: str) -> str:
         if 'name' in a_tag.attrs:
             name = a_tag['name']
             num = re.sub(r'\D', '', name)
-            a_tag.replace_with(f'<a id="{name}" class="footnote"></a>{num}')
+            a_tag.replace_with(f'<a id="{name}" name="{name}" class="footnote">{num}</a>')
         
         # Handle links with the 'href' attribute
         elif 'href' in a_tag.attrs:

@@ -20,6 +20,11 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.footnote {
+  font-size: 0.8rem;
+  color: #666;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
