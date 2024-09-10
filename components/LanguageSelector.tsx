@@ -8,10 +8,10 @@ import { usePathname } from "next/navigation"
 import { useSearchParams } from "next/navigation"
 
 const languages = [
-  { code: "english", flag: "🇬🇧" },
-  { code: "french", flag: "🇫🇷" },
-  { code: "spanish", flag: "🇪🇸" },
-  { code: "german", flag: "🇩🇪" }
+  { code: "english", flag: "🇬🇧", translation: "English" },
+  { code: "french", flag: "🇫🇷", translation: "Français" },
+  { code: "spanish", flag: "🇪🇸", translation: "Español" },
+  { code: "german", flag: "🇩🇪", translation: "Deutsch" }
   // { code: "Request a language!", flag: "💬" }
 ]
 
@@ -76,7 +76,7 @@ export default function LanguageSelector() {
                 tabIndex={-1}
                 onClick={() => setIsOpen(false)}
               >
-                {lang.flag} &nbsp; {lang.code.charAt(0).toUpperCase() + lang.code.slice(1)}
+                {lang.flag} &nbsp; {lang.translation}
               </Link>
             ))}
           </div>

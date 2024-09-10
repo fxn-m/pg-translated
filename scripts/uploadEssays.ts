@@ -1,19 +1,30 @@
-// TODO: Skip existing essays
+// TODO: skip essays that are already uploaded
 
+import { and, eq } from "drizzle-orm"
 import { readFileSync, readdirSync } from "fs"
 
+import { SupportedLanguage } from "@/db/schema"
 import { db } from "@/db"
 import { essays } from "@/db/schema"
 import path from "path"
 import yaml from "js-yaml"
 
-const language = "english"
-const essayDirectory = path.join(__dirname, "../python/essaysMD" + language)
+const language: string = "french"
+const model = "gpt-4o-mini"
+
+const fileName = "" // if uploading a specific file
+
+const essayDirectory = path.join(__dirname, "../python/essaysMD" + language + `${language !== "english" ? "-" + model : ""}`)
 const files = readdirSync(essayDirectory)
 
-async function uploadEssays() {
+async function uploadEssays(uploadedFiles: string[]) {
   for (const file of files) {
-    if (file != "greatwork.md") {
+    if (fileName && file !== fileName) {
+      continue
+    }
+
+    if (uploadedFiles.includes(file.split(".")[0])) {
+      console.log(`${file} already uploaded!`)
       continue
     }
 
@@ -22,6 +33,7 @@ async function uploadEssays() {
 
     type Metadata = {
       title?: string
+      translated_title?: string
       date?: string
       model?: string
     }
@@ -42,9 +54,10 @@ async function uploadEssays() {
       await db.insert(essays).values({
         title: metadata.title || file.split(".")[0],
         short_title: file.split(".")[0],
+        translated_title: metadata.translated_title || metadata.title || file.split(".")[0],
         content,
         date_written: date_written.toISOString(),
-        language,
+        language: language as SupportedLanguage,
         likes: 0
       })
       console.log(`${file} uploaded successfully!`)
@@ -54,7 +67,14 @@ async function uploadEssays() {
   }
 }
 const main = async () => {
-  await uploadEssays()
+  const uploadedEssays = await db
+    .select()
+    .from(essays)
+    .where(and(eq(essays.language, language as SupportedLanguage), eq(essays.translationModel, model)))
+
+  const uploadedShortTitles = uploadedEssays.map((essay) => essay.short_title)
+
+  await uploadEssays(uploadedShortTitles)
   process.exit(0)
 }
 

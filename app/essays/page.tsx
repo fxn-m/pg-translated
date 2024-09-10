@@ -10,7 +10,7 @@ export default async function Page({ searchParams }: { searchParams: Record<stri
   const essayArray = await db
     .select()
     .from(essays)
-    .where(eq(essays.language, language as SupportedLanguage)) // ! BAD: This is a hack to get the type of the enum values
+    .where(eq(essays.language, language as SupportedLanguage))
 
   if (essayArray.length === 0) {
     return <div>There are no essays in this language</div>
@@ -18,14 +18,15 @@ export default async function Page({ searchParams }: { searchParams: Record<stri
 
   return (
     <div className="flex h-full flex-grow flex-col">
-      <main className="flex flex-col">
+      <main className="flex flex-col space-y-2">
         {essayArray
           .sort((a, b) => new Date(b.date_written).getTime() - new Date(a.date_written).getTime())
           .map((essay) => (
-            <div key={essay.id}>
-              <Link className="text-blue-600 visited:text-gray-400" href={`/${essay.short_title}/${language}`}>
+            <div key={essay.id} className="flex flex-col">
+              <Link className="text-m text-blue-600 visited:text-gray-400 hover:underline" href={`/${essay.short_title}/${language}`}>
                 {essay.title}
               </Link>
+              <p className="text-sm text-gray-500">{essay.translated_title}</p>
             </div>
           ))}
       </main>

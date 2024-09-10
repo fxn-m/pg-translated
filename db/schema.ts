@@ -10,6 +10,7 @@ export const essays = pgTable(
     id: serial("id").primaryKey(),
     title: varchar("title").notNull(),
     short_title: varchar("short_title").notNull(),
+    translated_title: varchar("translated_title"),
     content: text("content").notNull(),
     date_written: date("date_written").notNull(),
     language: languageEnum("language").notNull(),

@@ -1,7 +1,8 @@
 import os
 import openai
+from countWords import *
 
-directory = './essaysMDenglish'
+originalDirectory = './essaysMDenglish'
 LLM_PROVIDER = "openai"
 MODEL_NAME = "gpt-4o-mini"
 TARGET_LANGUAGE = "French"
@@ -47,17 +48,23 @@ def translate_markdown(content, target_language):
 # Main function to process all markdown files in the directory
 # TODO: Log errors to a file
 def translate_all_markdown_files(target_language):
-    if not os.path.exists(directory):
-        print(f"Directory {directory} does not exist.")
+    if not os.path.exists(originalDirectory):
+        print(f"Directory {originalDirectory} does not exist.")
         return
     
-    output_directory = f"./essaysMD{target_language}"
+    output_directory = f"./essaysMD{target_language}-{MODEL_NAME.lower()}"
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
     
-    for filename in os.listdir(directory):
+    for filename in os.listdir(originalDirectory):
         if filename.endswith(".md"):
-            file_path = os.path.join(directory, filename)
+
+            # if the file already exists in the output directory, skip it
+            if os.path.exists(os.path.join(output_directory, filename)):
+                print(f"Skipping {filename} as it already exists in the output directory.")
+                continue
+
+            file_path = os.path.join(originalDirectory, filename)
             
             with open(file_path, 'r', encoding='utf-8') as file:
                 content = file.read()
@@ -78,16 +85,24 @@ def translate_all_markdown_files(target_language):
 
 
 def translate_one_markdown_file(target_language, file_name):
-    file_path = os.path.join(directory, file_name)
-    
-    with open(file_path, 'r', encoding='utf-8') as file:
-            content = file.read()   
+    file_path = os.path.join(originalDirectory, file_name)
+    output_directory = f"./essaysMD{target_language.lower()}-{MODEL_NAME.lower()}"
 
     print(f"Translating {file_path} to {target_language}...")
+
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
+        
+    if os.path.exists(os.path.join(output_directory, file_name)):
+        print(f"Skipping {file_name} as it already exists in the output directory.")
+        return
+    
+    with open(file_path, 'r', encoding='utf-8') as file:
+        content = file.read()   
     translated_content = translate_markdown(content, target_language)
 
     if translated_content:
-        translated_file_path = f"./essaysMD{target_language.lower()}/{file_name}"
+        translated_file_path = f"{output_directory}/{file_name}"
         with open(translated_file_path, 'w', encoding='utf-8') as translated_file:
             translated_file.write(translated_content)
                 
@@ -99,5 +114,9 @@ def translate_one_markdown_file(target_language, file_name):
 
 
 if __name__ == "__main__":
-    translate_one_markdown_file(TARGET_LANGUAGE, "read.md")
-    # translate_all_markdown_files(TARGET_LANGUAGE)
+    # # translate one file
+    # translate_one_markdown_file(TARGET_LANGUAGE, "greatwork.md")
+
+    # translate shortest 100 files
+    for essay in shortest_100_essays():
+        translate_one_markdown_file(TARGET_LANGUAGE, essay)

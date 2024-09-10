@@ -50,6 +50,13 @@
       "when": 1725927795311,
       "tag": "0006_narrow_wild_child",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1725975195436,
+      "tag": "0007_free_songbird",
+      "breakpoints": true
     }
   ]
 }
