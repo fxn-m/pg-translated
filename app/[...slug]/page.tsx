@@ -10,6 +10,17 @@ import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
 import { type SupportedLanguage, supportedLanguages } from "@/db/schema"
 
+// Return a list of `params` to populate the [slug] dynamic segment
+export async function generateStaticParams() {
+  const essayPermutations = await db.select().from(essays)
+
+  return essayPermutations.map((essay) => ({
+    shortTitle: essay.short_title,
+    lang: essay.language,
+    model: essay.translationModel
+  }))
+}
+
 export default async function Page({ params }: { params: { slug: string[] } }) {
   const [rawShortTitle, lang, model = "gpt-4o-mini"] = params.slug
 
