@@ -2,9 +2,9 @@ import "./globals.css"
 
 import { Inter } from "next/font/google"
 import LanguageSelector from "@/components/LanguageSelector"
-import Link from "next/link"
 import type { Metadata } from "next"
 import ModelSelector from "@/components/ModelSelector"
+import Navigation from "@/components/Navigation"
 import { Suspense } from "react"
 import localFont from "next/font/local"
 
@@ -43,12 +43,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} ${verdana.variable} ${inter.variable} flex min-h-screen flex-col gap-4 p-8 antialiased`}>
-        <div className="flex flex-row flex-wrap items-center justify-between gap-y-4">
-          <div className="flex flex-row gap-2 sm:gap-6">
-            <Link href="/">Home</Link>
-            <Link href="/essays">Essays</Link>
-          </div>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} ${verdana.variable} ${inter.variable} flex min-h-lvh flex-col p-8 antialiased sm:min-h-screen`}
+      >
+        <div className="flex h-10 flex-row flex-wrap items-center justify-between gap-y-4 sm:h-16">
+          <Suspense>
+            <Navigation />
+          </Suspense>
           <div className="ml-auto flex flex-row gap-2 sm:gap-6">
             <Suspense fallback={<div>Loading...</div>}>
               <ModelSelector />
