@@ -43,6 +43,13 @@
       "when": 1725920945272,
       "tag": "0005_woozy_red_shift",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1725927795311,
+      "tag": "0006_narrow_wild_child",
+      "breakpoints": true
     }
   ]
 }

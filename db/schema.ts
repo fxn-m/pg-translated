@@ -11,7 +11,7 @@ export const essays = pgTable(
     title: varchar("title").notNull(),
     short_title: varchar("short_title").notNull(),
     content: text("content").notNull(),
-    date_written: date("date_written"),
+    date_written: date("date_written").notNull(),
     language: languageEnum("language").notNull(),
     translationModel: varchar("translation_model").default("gpt-4o-mini"),
     created_at: timestamp("created_at").defaultNow(),

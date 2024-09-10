@@ -1,0 +1,1 @@
+ALTER TABLE "essays" ALTER COLUMN "date_written" SET NOT NULL;

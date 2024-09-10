@@ -19,13 +19,15 @@ export default async function Page({ searchParams }: { searchParams: Record<stri
   return (
     <div className="flex h-full flex-grow flex-col">
       <main className="flex flex-col">
-        {essayArray.map((essay) => (
-          <div key={essay.id}>
-            <Link className="text-blue-600 visited:text-gray-400" href={`/${essay.short_title}/${language}`}>
-              {essay.title}
-            </Link>
-          </div>
-        ))}
+        {essayArray
+          .sort((a, b) => new Date(b.date_written).getTime() - new Date(a.date_written).getTime())
+          .map((essay) => (
+            <div key={essay.id}>
+              <Link className="text-blue-600 visited:text-gray-400" href={`/${essay.short_title}/${language}`}>
+                {essay.title}
+              </Link>
+            </div>
+          ))}
       </main>
     </div>
   )

@@ -1,30 +1,51 @@
+// TODO: Skip existing essays
+
 import { readFileSync, readdirSync } from "fs"
 
 import { db } from "@/db"
 import { essays } from "@/db/schema"
 import path from "path"
+import yaml from "js-yaml"
 
-const language = "french"
-
+const language = "english"
 const essayDirectory = path.join(__dirname, "../python/essaysMD" + language)
-
 const files = readdirSync(essayDirectory)
 
 async function uploadEssays() {
   for (const file of files) {
-    if (file !== "read.md") {
+    if (file != "greatwork.md") {
       continue
     }
 
-    const content = readFileSync(path.join(essayDirectory, file)).toString()
-    console.log(`Uploading ${file.split(".")[0]}...`)
+    const markdown = readFileSync(path.join(essayDirectory, file), "utf-8")
+    const match = markdown.match(/^---\n([\s\S]+?)\n---/)
+
+    type Metadata = {
+      title?: string
+      date?: string
+      model?: string
+    }
+
+    let metadata: Metadata = {}
+    let content = markdown
+
+    if (match) {
+      metadata = yaml.load(match[1]) as Metadata
+      content = markdown.slice(match[0].length).trim()
+    }
+
+    console.log(`Uploading ${metadata.title || file.split(".")[0]}...`)
+
+    const date_written = metadata.date ? new Date(metadata.date) : new Date()
 
     try {
       await db.insert(essays).values({
-        title: file.split(".")[0],
+        title: metadata.title || file.split(".")[0],
+        short_title: file.split(".")[0],
         content,
-        likes: 0,
-        language
+        date_written: date_written.toISOString(),
+        language,
+        likes: 0
       })
       console.log(`${file} uploaded successfully!`)
     } catch (e) {
