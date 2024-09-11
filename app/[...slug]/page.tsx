@@ -9,6 +9,22 @@ import { remark } from "remark"
 import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
 import { type SupportedLanguage, supportedLanguages } from "@/db/schema"
+import Link from "next/link"
+import { ArrowUpRight } from "lucide-react"
+
+function ExternalLinkComponent({ short_title }: { short_title: string }) {
+  return (
+    <Link
+      href={`https://paulgraham.com/${short_title}.html`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group relative inline-flex items-center text-blue-600 decoration-transparent transition-colors hover:text-blue-400 hover:decoration-transparent"
+    >
+      Original
+      <ArrowUpRight className="h-3 w-3 text-blue-600 transition-colors group-hover:text-blue-400" aria-hidden="true" />
+    </Link>
+  )
+}
 
 // Return a list of `params` to populate the [slug] dynamic segment
 export async function generateStaticParams() {
@@ -46,9 +62,10 @@ export default async function Page({ params }: { params: { slug: string[] } }) {
   const contentHtml = parsedContent.toString()
 
   return (
-    <div className="min-h-screen items-center justify-items-center font-geistSans">
-      <main className="row-start-2 flex flex-col items-start gap-8 text-sm sm:items-start">
+    <div className="items-center justify-items-center pb-8 font-geistSans">
+      <main className="row-start-2 flex flex-col items-start gap-4 text-sm sm:items-start">
         <h1 className="text-xl">{essay.title.toUpperCase()}</h1>
+        <ExternalLinkComponent short_title={essay.short_title} />
         <div className="max-w-2xl space-y-4 font-verdana md:w-2/3 lg:w-1/2" dangerouslySetInnerHTML={{ __html: contentHtml }} />
       </main>
     </div>
