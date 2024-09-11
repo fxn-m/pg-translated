@@ -70,7 +70,7 @@ export default function LanguageSelector() {
             {languages.map((lang) => (
               <Link
                 key={lang.code}
-                href={`/${shortTitle}${shortTitle === "essays" ? "?lang=" + lang.code : `/${lang.code}`}`}
+                href={`/${shortTitle}${shortTitle === "essays" ? "/" + lang.code : `/${lang.code}`}`}
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
                 role="menuitem"
                 tabIndex={-1}

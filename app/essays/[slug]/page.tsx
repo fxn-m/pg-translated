@@ -1,11 +1,17 @@
 import { db } from "@/db"
 import { eq } from "drizzle-orm"
 import { essays } from "@/db/schema"
-import { type SupportedLanguage } from "@/db/schema"
+import { type SupportedLanguage, supportedLanguages } from "@/db/schema"
 import Link from "next/link"
 
-export default async function Page({ searchParams }: { searchParams: Record<string, string> }) {
-  const language = searchParams["lang"] || "english"
+// Return a list of `params` to populate the [slug] dynamic segment
+export const generateStaticParams = async () =>
+  supportedLanguages.map((language) => ({
+    language
+  }))
+
+export default async function Page({ params }: { params: { slug: string } }) {
+  const language = params.slug
 
   const essayArray = await db
     .select()
