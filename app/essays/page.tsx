@@ -17,7 +17,7 @@ export default async function Page({ searchParams }: { searchParams: Record<stri
   }
 
   return (
-    <div className="flex h-full flex-grow flex-col">
+    <div className="flex flex-grow flex-col pb-8">
       <main className="flex flex-col space-y-2">
         {essayArray
           .sort((a, b) => new Date(b.date_written).getTime() - new Date(a.date_written).getTime())
