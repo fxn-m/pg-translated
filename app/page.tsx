@@ -1,8 +1,6 @@
 export default function Home() {
   return (
-    <div className="mt-8 flex h-full flex-grow flex-col items-center justify-between">
-      <p></p>
-
+    <div className="mt-8 flex flex-grow flex-col items-center justify-end">
       <footer className="flex flex-col gap-4 text-xs text-gray-500">
         <p>
           None of the content on this website is my own. All essays are written by Paul Graham and are reproduced here for educational and informational

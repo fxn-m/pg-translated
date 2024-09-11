@@ -46,10 +46,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${verdana.variable} ${inter.variable} flex min-h-lvh flex-col p-8 antialiased sm:min-h-screen`}
       >
-        <div className="flex h-10 flex-row flex-wrap items-center justify-between gap-y-4 sm:h-16">
+        <div className="mb-4 flex h-10 flex-row flex-wrap items-center justify-between gap-y-4 sm:mb-0 sm:h-16">
           <Suspense>
             <Navigation />
           </Suspense>
+
           <div className="ml-auto flex flex-row gap-2 sm:gap-6">
             <Suspense fallback={<div>Loading...</div>}>
               <ModelSelector />
