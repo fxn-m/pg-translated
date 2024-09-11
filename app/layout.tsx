@@ -58,7 +58,7 @@ export default function RootLayout({
             </Suspense>
           </div>
         </div>
-        {children}
+        <Suspense>{children}</Suspense>
       </body>
     </html>
   )
