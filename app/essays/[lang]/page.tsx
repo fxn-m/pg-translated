@@ -10,8 +10,8 @@ export const generateStaticParams = async () =>
     language
   }))
 
-export default async function Page({ params }: { params: { slug: string } }) {
-  const language = params.slug
+export default async function Page({ params }: { params: { lang: string } }) {
+  const language = params.lang
 
   const essayArray = await db
     .select()
@@ -30,7 +30,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
           .map((essay) => (
             <div key={essay.id} className="flex flex-col">
               <p>
-                <Link className="text-m text-blue-600 visited:text-gray-400 hover:underline" href={`/${essay.short_title}/${language}`}>
+                <Link className="text-m text-blue-600 visited:text-gray-400 hover:underline" href={`/essays/${language}/${essay.short_title}`}>
                   {essay.title}
                 </Link>
               </p>

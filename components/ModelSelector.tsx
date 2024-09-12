@@ -5,20 +5,15 @@ import { useEffect, useRef, useState } from "react"
 import { ChevronDown } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useSearchParams } from "next/navigation"
 
 const models = ["gpt-4o-mini"]
 
 export default function ModelSelector() {
   const [isOpen, setIsOpen] = useState(false)
-
   const dropdownRef = useRef<HTMLDivElement>(null)
-
   const pathname = usePathname()
-  const searchParams = useSearchParams()
 
-  const [shortTitle, lang, model] = pathname.split("/").filter(Boolean)
-  const currentLang = lang || searchParams.get("lang") || "english"
+  const [lang, shortTitle, model] = pathname.split("/").filter(Boolean).slice(1)
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -33,7 +28,9 @@ export default function ModelSelector() {
     }
   }, [])
 
-  if ((!lang && shortTitle !== "essays") || !shortTitle) {
+  console.log("pathname", pathname)
+
+  if (lang === undefined || shortTitle === undefined) {
     return null
   }
 
@@ -64,7 +61,7 @@ export default function ModelSelector() {
             {models.map((model) => (
               <Link
                 key={model}
-                href={`/${shortTitle}/${currentLang}/${model}`}
+                href={`/essays/${lang}/${shortTitle}/${model}`}
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
                 role="menuitem"
                 tabIndex={-1}

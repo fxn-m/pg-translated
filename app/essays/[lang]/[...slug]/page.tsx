@@ -37,8 +37,9 @@ export async function generateStaticParams() {
   }))
 }
 
-export default async function Page({ params }: { params: { slug: string[] } }) {
-  const [rawShortTitle, lang, model = "gpt-4o-mini"] = params.slug
+export default async function Page({ params }: { params: { lang: string; slug: string[] } }) {
+  const { lang, slug } = params
+  const [rawShortTitle, model = "gpt-4o-mini"] = slug
 
   const language = lang.toLowerCase() as SupportedLanguage // ! BAD: This is a hack to get the type of the enum values
 

@@ -36,7 +36,7 @@ export default function Home() {
               <span>Paul Graham&apos;s&nbsp;</span>
               <span className="relative font-mono text-blue-600">
                 {isValidLanguage ? (
-                  <Link href={`/essays?lang=${language}`}>{languageData[language].translation}</Link>
+                  <Link href={`/essays/${language}`}>{languageData[language].translation}</Link>
                 ) : (
                   <Typewriter words={translations} loop={1} typeSpeed={100} deleteSpeed={50} delaySpeed={2000} />
                 )}

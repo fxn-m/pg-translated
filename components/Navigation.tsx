@@ -34,7 +34,7 @@ export default function Navigation() {
     <Suspense>
       <nav className="flex flex-row items-center space-x-2">
         <NavLink href={`/${currentLang ? "?lang=" + currentLang : ""}`}>Home</NavLink>
-        <NavLink href={`/essays/${currentLang}?lang=${currentLang}`}>Essays</NavLink>
+        <NavLink href={`/essays/${currentLang}`}>Essays</NavLink>
       </nav>
     </Suspense>
   )

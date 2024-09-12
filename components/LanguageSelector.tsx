@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react"
 import { ChevronDown } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useSearchParams } from "next/navigation"
 
 const languages = [
   { code: "english", flag: "🇬🇧", translation: "English" },
@@ -17,14 +16,12 @@ const languages = [
 
 export default function LanguageSelector() {
   const [isOpen, setIsOpen] = useState(false)
-
   const dropdownRef = useRef<HTMLDivElement>(null)
-
   const pathname = usePathname()
-  const searchParams = useSearchParams()
 
-  const [shortTitle, lang] = pathname.split("/").filter(Boolean)
-  const currentLang = lang || searchParams.get("lang") || "english"
+  const [lang, shortTitle = ""] = pathname.split("/").filter(Boolean).slice(1)
+
+  console.log(lang, shortTitle)
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -39,7 +36,7 @@ export default function LanguageSelector() {
     }
   }, [])
 
-  if ((!lang && shortTitle !== "essays") || !shortTitle) {
+  if (lang === undefined) {
     return null
   }
 
@@ -54,7 +51,7 @@ export default function LanguageSelector() {
           aria-haspopup="true"
           onClick={() => setIsOpen(!isOpen)}
         >
-          {languages.find((lang) => lang.code === currentLang)?.flag || "🌐"}
+          {languages.find((language) => language.code === lang)?.flag || "🌐"}
           <ChevronDown className={`-mr-1 h-5 w-5 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""} dark:text-gray-300`} aria-hidden="true" />
         </button>
       </div>
@@ -67,16 +64,16 @@ export default function LanguageSelector() {
           tabIndex={-1}
         >
           <div className="py-1" role="none">
-            {languages.map((lang) => (
+            {languages.map((language) => (
               <Link
-                key={lang.code}
-                href={`/${shortTitle}${shortTitle === "essays" ? "/" + lang.code : `/${lang.code}`}`}
+                key={language.code}
+                href={`/essays/${language.code}/${shortTitle}`}
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
                 role="menuitem"
                 tabIndex={-1}
                 onClick={() => setIsOpen(false)}
               >
-                {lang.flag} &nbsp; {lang.translation}
+                {language.flag} &nbsp; {language.translation}
               </Link>
             ))}
           </div>
