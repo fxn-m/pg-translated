@@ -9,7 +9,6 @@ const languageData: Record<string, { translation: string; flag: string }> = {
   english: { translation: "essays", flag: "🇬🇧" },
   french: { translation: "essais", flag: "🇫🇷" },
   spanish: { translation: "ensayos", flag: "🇪🇸" },
-  italian: { translation: "saggi", flag: "🇮🇹" },
   german: { translation: "aufsätze", flag: "🇩🇪" }
 }
 

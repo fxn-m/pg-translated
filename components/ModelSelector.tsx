@@ -28,7 +28,7 @@ export default function ModelSelector() {
     }
   }, [])
 
-  if (lang === undefined || shortTitle === undefined) {
+  if (lang === undefined || shortTitle === undefined || lang === "english") {
     return null
   }
 
