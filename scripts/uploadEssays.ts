@@ -1,5 +1,3 @@
-// TODO: skip essays that are already uploaded
-
 import { SupportedLanguage, supportedLanguages } from "@/db/schema"
 import { and, eq } from "drizzle-orm"
 import { readFileSync, readdirSync } from "fs"
@@ -9,20 +7,16 @@ import { essays } from "@/db/schema"
 import path from "path"
 import yaml from "js-yaml"
 
-const language: string = "german"
-// const model = "gpt-4o-mini"
-let model = "claude-3-haiku-20240307"
-
 const fileName = "" // * if uploading a specific file
 
-const essayDirectory = path.join(__dirname, "../python/essaysMD" + language + `${language !== "english" ? "-" + model : ""}`)
-const files = readdirSync(essayDirectory)
+async function uploadEssays(uploadedFiles: string[], language: SupportedLanguage, model: string) {
+  const essayDirectory = path.join(__dirname, "../python/essaysMD" + language + `${language !== "english" ? "-" + model : ""}`)
+  const files = readdirSync(essayDirectory)
 
-if (model === "claude-3-haiku-20240307") {
-  model = "claude-3-haiku"
-}
+  if (model === "claude-3-haiku-20240307") {
+    model = "claude-3-haiku"
+  }
 
-async function uploadEssays(uploadedFiles: string[]) {
   for (const file of files) {
     if (fileName && file !== fileName) {
       continue
@@ -61,11 +55,13 @@ async function uploadEssays(uploadedFiles: string[]) {
     }
 
     console.log(`Uploading ${metadata.title || file.split(".")[0]}...`)
+    console.log(`Language: ${language}`)
+    console.log(`Model: ${model}`)
 
     const date_written = metadata.date && new Date(metadata.date?.match(/([A-Za-z]+\s\d{4})/)![0]).toISOString()
 
     if (!date_written) {
-      console.error(`Failed to upload ${file}: date not found in metadata`)
+      console.error(`Failed to upload ${file}: date not found in metadata\n`)
       continue
     }
 
@@ -83,7 +79,7 @@ async function uploadEssays(uploadedFiles: string[]) {
         date_written: date_written,
         language: language as SupportedLanguage,
         likes: 0,
-        translationModel: model
+        translationModel: language !== "english" ? model : undefined
       })
       console.log(`${file} uploaded successfully!\n`)
     } catch (e) {
@@ -91,15 +87,28 @@ async function uploadEssays(uploadedFiles: string[]) {
     }
   }
 }
+
 const main = async () => {
-  const uploadedEssays = await db
-    .select()
-    .from(essays)
-    .where(and(eq(essays.language, language as SupportedLanguage), eq(essays.translationModel, model)))
+  const models = ["gpt-4o-mini", "claude-3-haiku-20240307"]
+  for (const language of supportedLanguages) {
+    for (const model of models) {
+      if (language === "english" && model === "claude-3-haiku-20240307") {
+        continue
+      }
 
-  const uploadedShortTitles = uploadedEssays.map((essay) => essay.short_title)
+      const uploadedEssays = await db
+        .select()
+        .from(essays)
+        .where(
+          and(eq(essays.language, language as SupportedLanguage), eq(essays.translationModel, model === "claude-3-haiku-20240307" ? "claude-3-haiku" : model))
+        )
 
-  await uploadEssays(uploadedShortTitles)
+      const uploadedShortTitles = uploadedEssays.map((essay) => essay.short_title)
+
+      await uploadEssays(uploadedShortTitles, language, model)
+    }
+  }
+
   process.exit(0)
 }
 

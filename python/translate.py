@@ -2,9 +2,10 @@ import json
 import os
 import openai
 import anthropic
-from countWords import *
 import argparse
 from metadata import overwrite_metadata
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from helpers import sort_essays_by_length, shortest_100_essays
 
 originalDirectory = './essaysMDenglish'
 
@@ -173,9 +174,70 @@ def translate_one_markdown_file(target_language, file_name):
 
     print("Translation process completed.")
 
+# if __name__ == "__main__":
+#     # translate shortest 20 files
+#     for i, essay in enumerate(shortest_100_essays()):
+#         print(f"\n{i} Translating {essay}...")
+#         translate_one_markdown_file(TARGET_LANGUAGE.capitalize(), essay)
+#     overwrite_metadata(TARGET_LANGUAGE.lower(), MODEL_NAME)
+
+
+BATCH_SIZE = 5
+
+def translate_batch(file_batch, target_language, output_directory):
+    for file_name in file_batch:
+        file_path = os.path.join(originalDirectory, file_name)
+        
+        # Skip if file already exists in the output directory
+        if os.path.exists(os.path.join(output_directory, file_name)):
+            print(f"Skipping {file_name} as it already exists in the output directory.")
+            continue
+        
+        # Read the markdown content
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = file.read()
+        
+        # Translate the markdown content
+        translated_content = translate_markdown(content, target_language)
+
+        if translated_content:
+            # Save the translated content to the output directory
+            translated_file_path = os.path.join(output_directory, file_name)
+            with open(translated_file_path, 'w', encoding='utf-8') as translated_file:
+                translated_file.write(translated_content)
+            print(f"Saved translated file: {translated_file_path}")
+        else:
+            print(f"Failed to translate {file_name}")
+
+def translate_all_markdown_files_in_batches(target_language):
+    if not os.path.exists(originalDirectory):
+        print(f"Directory {originalDirectory} does not exist.")
+        return
+    
+    output_directory = f"./essaysMD{target_language.lower()}-{MODEL_NAME.lower()}"
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
+
+    # markdown_files = [f for f in os.listdir(originalDirectory) if f.endswith(".md")]
+    # ! Sort by length of content
+    markdown_files = list(sort_essays_by_length())
+
+    file_batches = [markdown_files[i:i + BATCH_SIZE] for i in range(0, len(markdown_files), BATCH_SIZE)]
+    
+    with ThreadPoolExecutor() as executor:
+        futures = []
+        
+        for batch in file_batches:
+            futures.append(executor.submit(translate_batch, batch, target_language, output_directory))
+        
+        for future in as_completed(futures):
+            try:
+                future.result()
+            except Exception as e:
+                print(f"Error occurred in a batch: {e}")
+    
+    print("Translation process completed.")
+
 if __name__ == "__main__":
-    # translate shortest 20 files
-    for i, essay in enumerate(shortest_100_essays()):
-        print(f"\n{i} Translating {essay}...")
-        translate_one_markdown_file(TARGET_LANGUAGE.capitalize(), essay)
+    translate_all_markdown_files_in_batches(TARGET_LANGUAGE.capitalize())
     overwrite_metadata(TARGET_LANGUAGE.lower(), MODEL_NAME)

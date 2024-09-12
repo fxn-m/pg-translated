@@ -70,6 +70,8 @@ def overwrite_metadata(lang, model="gpt-4o-mini"):
     """Copy metadata from english .md files to translated ones, adding translated_title."""
 
     translated_dir = f"{CURRENT_DIR}/essaysMD{lang}-{model}"
+    error_count = 0
+
 
     for filename in os.listdir(translated_dir):
         if filename.endswith(".md"):
@@ -109,7 +111,16 @@ def overwrite_metadata(lang, model="gpt-4o-mini"):
                 translated_metadata = yaml.safe_load(translated_metadata_match.group(1))
                 print(f"Translated metadata extracted from {filename}")
             else:
-                print(f"No metadata found in the translated file for {filename}")
+                print(f"\033[91mNo metadata found in the translated file for {filename}\033[0m")
+                error_count += 1
+
+                # remove the first two lines of the file
+                with open(file_path, 'r', encoding='utf-8') as file:
+                    lines = file.readlines()
+                    lines = lines[2:]
+                with open(file_path, 'w', encoding='utf-8') as file:
+                    file.writelines(lines)
+
                 continue
 
             if translated_metadata.get('translated_title'):
@@ -135,7 +146,9 @@ def overwrite_metadata(lang, model="gpt-4o-mini"):
 
             print(f"Metadata copied to {filename}")
 
+    if error_count: print(f"\n{error_count} errors.")
+
 if __name__ == "__main__":
-    language = 'german'
-    model = 'gpt-4o-mini'
+    language = 'french'
+    model = 'claude-3-haiku-20240307'
     overwrite_metadata(language, model)

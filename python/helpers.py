@@ -24,5 +24,28 @@ def shortest_100_essays():
     # return the titles of the 100 shortest essays
     return list(sorted_essayWordsMap.keys())[:100]
 
+def sort_essays_by_length():
+    essayWordsMap = {}
+
+    for filename in os.listdir('./essaysMDenglish'):
+        if filename.endswith(".md"):
+            words = count_words(filename)
+            essayWordsMap[filename] = words
+
+    # sort by number of words ascending
+    sorted_essayWordsMap = dict(sorted(essayWordsMap.items(), key=lambda item: item[1]))
+
+    return sorted_essayWordsMap.keys()
+
+def count_translations():
+    for folder in os.listdir('.'):
+        if folder.startswith('essaysMD'):
+            print(folder)
+            count = 0
+            for filename in os.listdir(folder):
+                if filename.endswith(".md"):
+                    count += 1
+            print("Number of translations:", str(count) + "\n")
+
 if __name__ == "__main__":
-    shortest_100_essays()
+    count_translations()
