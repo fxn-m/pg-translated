@@ -19,7 +19,7 @@ export default function LanguageSelector() {
   const dropdownRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
 
-  const [lang, shortTitle = ""] = pathname.split("/").filter(Boolean).slice(1)
+  const [lang, shortTitle = "", model] = pathname.split("/").filter(Boolean).slice(1)
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -65,7 +65,7 @@ export default function LanguageSelector() {
             {languages.map((language) => (
               <Link
                 key={language.code}
-                href={`/essays/${language.code}/${shortTitle}`}
+                href={`/essays/${language.code}/${shortTitle}/${model ? model : ""}`}
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
                 role="menuitem"
                 tabIndex={-1}
