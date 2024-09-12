@@ -21,8 +21,6 @@ export default function LanguageSelector() {
 
   const [lang, shortTitle = ""] = pathname.split("/").filter(Boolean).slice(1)
 
-  console.log(lang, shortTitle)
-
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {

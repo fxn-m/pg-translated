@@ -28,8 +28,6 @@ export default function ModelSelector() {
     }
   }, [])
 
-  console.log("pathname", pathname)
-
   if (lang === undefined || shortTitle === undefined) {
     return null
   }
