@@ -1,11 +1,41 @@
+import json
 import os
 import openai
 from countWords import *
+import argparse
 
 originalDirectory = './essaysMDenglish'
-LLM_PROVIDER = "openai"
-MODEL_NAME = "gpt-4o-mini"
-TARGET_LANGUAGE = "French"
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-lang", "--language", help="Language to translate to", type=str)
+parser.add_argument("-model", "--model", help="Model", type=int)
+args = parser.parse_args()
+
+TARGET_LANGUAGE = args.language
+with open("./supported_languages.json", "r") as f:
+    supported_languages = json.load(f)["supported_languages"]
+
+if TARGET_LANGUAGE not in supported_languages:
+    print(f"Language {TARGET_LANGUAGE} is not supported.")
+    exit()
+
+try: 
+    MODEL_NAME = {
+        1: "gpt-4o-mini",
+        2: "claude-3-haiku",
+        3: "llama-3-7b",
+    }[args.model]
+except KeyError:
+    print(f"Model {args.model} is not supported.")
+    exit()
+
+LLM_PROVIDER = {
+    "gpt-4o-mini": "openai",
+    "claude-3-haiku": "anthropic",
+    "llama-3-7b": "meta"
+}[MODEL_NAME]
+
+print(f"Translating to {args.language.capitalize()} with {MODEL_NAME}...")    
 
 client = openai.Client(api_key=os.environ.get("OPENAI_API_KEY"))
 
@@ -45,9 +75,9 @@ def translate_markdown(content, target_language):
         print(f"Error during translation: {e}")
         return None
 
-# Main function to process all markdown files in the directory
-# TODO: Log errors to a file
 def translate_all_markdown_files(target_language):
+    # TODO: PARALLELIZE THIS
+
     if not os.path.exists(originalDirectory):
         print(f"Directory {originalDirectory} does not exist.")
         return
@@ -83,7 +113,6 @@ def translate_all_markdown_files(target_language):
     
     print("Translation process completed.")
 
-
 def translate_one_markdown_file(target_language, file_name):
     file_path = os.path.join(originalDirectory, file_name)
     output_directory = f"./essaysMD{target_language.lower()}-{MODEL_NAME.lower()}"
@@ -112,11 +141,8 @@ def translate_one_markdown_file(target_language, file_name):
 
     print("Translation process completed.")
 
-
 if __name__ == "__main__":
-    # # translate one file
-    # translate_one_markdown_file(TARGET_LANGUAGE, "greatwork.md")
-
-    # translate shortest 100 files
-    for essay in shortest_100_essays():
-        translate_one_markdown_file(TARGET_LANGUAGE, essay)
+    translate_one_markdown_file(TARGET_LANGUAGE.capitalize(), "foundermode.md")
+    # # translate shortest 100 files
+    # for essay in shortest_100_essays():
+    #     translate_one_markdown_file(TARGET_LANGUAGE.capitalize(), essay)

@@ -2,6 +2,7 @@ import re
 from bs4 import BeautifulSoup
 import os
 import yaml
+import datetime
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -72,6 +73,8 @@ def overwrite_metadata(lang, model="gpt-4o-mini"):
     translated_dir = f"{CURRENT_DIR}/essaysMD{lang}-{model}"
 
     for filename in os.listdir(translated_dir):
+        if not filename == "whyyc.md":
+            continue
 
         if filename.endswith(".md"):
             file_path = os.path.join(translated_dir, filename)
@@ -84,10 +87,18 @@ def overwrite_metadata(lang, model="gpt-4o-mini"):
             original_metadata_match = re.search(r'^---(.*?)---', original_content, re.DOTALL)
             if original_metadata_match:
                 original_metadata = yaml.safe_load(original_metadata_match.group(1))
-                print(f"Metadata extracted from {filename}")
+                print(f"\nMetadata extracted from {filename}")
             else:
                 print(f"No metadata found in {filename}")
                 continue
+
+            print("Original metadata 'date':", original_metadata.get('date'))
+            # format the date as a date string
+            if original_metadata.get('date'):
+                date = datetime.datetime.strptime(original_metadata.get('date'), '%B %Y')
+                formatted_date = date.strftime('%Y-%m-%d')
+                original_metadata['date'] = formatted_date
+
 
             # read the translated file
             with open(file_path, 'r', encoding='utf-8') as file:

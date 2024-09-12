@@ -1,15 +1,15 @@
 // TODO: skip essays that are already uploaded
 
+import { SupportedLanguage, supportedLanguages } from "@/db/schema"
 import { and, eq } from "drizzle-orm"
 import { readFileSync, readdirSync } from "fs"
 
-import { SupportedLanguage } from "@/db/schema"
 import { db } from "@/db"
 import { essays } from "@/db/schema"
 import path from "path"
 import yaml from "js-yaml"
 
-const language: string = "french"
+const language: string = "english"
 const model = "gpt-4o-mini"
 
 const fileName = "" // if uploading a specific file
@@ -24,7 +24,7 @@ async function uploadEssays(uploadedFiles: string[]) {
     }
 
     if (uploadedFiles.includes(file.split(".")[0])) {
-      console.log(`${file} already uploaded!`)
+      console.log(`${file} already uploaded!\n`)
       continue
     }
 
@@ -46,9 +46,24 @@ async function uploadEssays(uploadedFiles: string[]) {
       content = markdown.slice(match[0].length).trim()
     }
 
+    if (content.length === 0) {
+      console.error(`Failed to upload ${file}: content not found\n`)
+      continue
+    }
+
     console.log(`Uploading ${metadata.title || file.split(".")[0]}...`)
 
-    const date_written = metadata.date ? new Date(metadata.date) : new Date()
+    const date_written = metadata.date && new Date(metadata.date?.match(/([A-Za-z]+\s\d{4})/)![0]).toISOString()
+
+    if (!date_written) {
+      console.error(`Failed to upload ${file}: date not found in metadata`)
+      continue
+    }
+
+    if (!supportedLanguages.includes(language as SupportedLanguage)) {
+      console.error(`Failed to upload ${file}: invalid language`)
+      continue
+    }
 
     try {
       await db.insert(essays).values({
@@ -56,13 +71,13 @@ async function uploadEssays(uploadedFiles: string[]) {
         short_title: file.split(".")[0],
         translated_title: metadata.translated_title || metadata.title || file.split(".")[0],
         content,
-        date_written: date_written.toISOString(),
+        date_written: date_written,
         language: language as SupportedLanguage,
         likes: 0
       })
-      console.log(`${file} uploaded successfully!`)
+      console.log(`${file} uploaded successfully!\n`)
     } catch (e) {
-      console.error(`Failed to upload ${file}:`, e)
+      console.error(`Failed to upload ${file}:\n`, e)
     }
   }
 }
