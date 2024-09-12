@@ -9,17 +9,26 @@ import { essays } from "@/db/schema"
 import path from "path"
 import yaml from "js-yaml"
 
-const language: string = "english"
-const model = "gpt-4o-mini"
+const language: string = "german"
+// const model = "gpt-4o-mini"
+let model = "claude-3-haiku-20240307"
 
-const fileName = "" // if uploading a specific file
+const fileName = "" // * if uploading a specific file
 
 const essayDirectory = path.join(__dirname, "../python/essaysMD" + language + `${language !== "english" ? "-" + model : ""}`)
 const files = readdirSync(essayDirectory)
 
+if (model === "claude-3-haiku-20240307") {
+  model = "claude-3-haiku"
+}
+
 async function uploadEssays(uploadedFiles: string[]) {
   for (const file of files) {
     if (fileName && file !== fileName) {
+      continue
+    }
+
+    if (file == "polls.md" || file == "foundervisa.md") {
       continue
     }
 
@@ -73,7 +82,8 @@ async function uploadEssays(uploadedFiles: string[]) {
         content,
         date_written: date_written,
         language: language as SupportedLanguage,
-        likes: 0
+        likes: 0,
+        translationModel: model
       })
       console.log(`${file} uploaded successfully!\n`)
     } catch (e) {

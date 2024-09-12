@@ -5,30 +5,33 @@ Rename all files in the essaysHTML directory to the href attribute of the corres
 from bs4 import BeautifulSoup
 import os
 
-CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
-with open(CURRENT_DIR + "/articles.html", 'r') as file:
-    articles = file.read()
+def main():
 
-soup = BeautifulSoup(articles, 'html.parser')
-soup.prettify()
+    CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
+    with open(CURRENT_DIR + "/articles.html", 'r') as file:
+        articles = file.read()
 
-links = soup.findAll('a')
+    soup = BeautifulSoup(articles, 'html.parser')
+    soup.prettify()
 
-essaysDir = os.listdir(CURRENT_DIR + '/essaysHTML')
+    links = soup.findAll('a')
 
-for i, link in enumerate(links):
-    if 'Chapter' in link.text:
-        continue
-    title = link.text
-    href = link['href']
-    href = href.split('.html')[0]
+    essaysDir = os.listdir(CURRENT_DIR + '/essaysHTML')
 
-    # if the text exists as a filename in essaysHTML, rename it to the href without the .html extension
-    if title + '.html' in essaysDir:
-        try:
-            os.rename(CURRENT_DIR + '/essaysHTML/' + title + '.html', CURRENT_DIR + '/essaysHTML/' + href + '.html')
-            print(f"renamed {title}.html to {href}.html")
-        except FileNotFoundError as error:
-            print(f"Error renaming {title}.html: {error}")
+    for i, link in enumerate(links):
+        if 'Chapter' in link.text:
+            continue
+        title = link.text
+        href = link['href']
+        href = href.split('.html')[0]
 
+        # if the text exists as a filename in essaysHTML, rename it to the href without the .html extension
+        if title + '.html' in essaysDir:
+            try:
+                os.rename(CURRENT_DIR + '/essaysHTML/' + title + '.html', CURRENT_DIR + '/essaysHTML/' + href + '.html')
+                print(f"renamed {title}.html to {href}.html")
+            except FileNotFoundError as error:
+                print(f"Error renaming {title}.html: {error}")
 
+if __name__ == "__main__":
+    main()

@@ -66,16 +66,12 @@ def process_all_links(language, model):
 
         generate_metadata(markdown_file_path, title)
 
-
 def overwrite_metadata(lang, model="gpt-4o-mini"):
     """Copy metadata from english .md files to translated ones, adding translated_title."""
 
     translated_dir = f"{CURRENT_DIR}/essaysMD{lang}-{model}"
 
     for filename in os.listdir(translated_dir):
-        if not filename == "whyyc.md":
-            continue
-
         if filename.endswith(".md"):
             file_path = os.path.join(translated_dir, filename)
 
@@ -92,13 +88,16 @@ def overwrite_metadata(lang, model="gpt-4o-mini"):
                 print(f"No metadata found in {filename}")
                 continue
 
-            print("Original metadata 'date':", original_metadata.get('date'))
-            # format the date as a date string
-            if original_metadata.get('date'):
-                date = datetime.datetime.strptime(original_metadata.get('date'), '%B %Y')
-                formatted_date = date.strftime('%Y-%m-%d')
-                original_metadata['date'] = formatted_date
+            date = original_metadata.get('date')
+            if date == "None" or date == None:
+                print(f"No date found in {filename}")
+                continue
 
+            date_parts = re.split('[,(]', date)
+            date = date_parts[0].strip()
+            date = datetime.datetime.strptime(date, '%B %Y')
+            date = date.strftime('%B %Y')
+            original_metadata['date'] = date
 
             # read the translated file
             with open(file_path, 'r', encoding='utf-8') as file:
@@ -136,8 +135,7 @@ def overwrite_metadata(lang, model="gpt-4o-mini"):
 
             print(f"Metadata copied to {filename}")
 
-
-language = 'french'
-model = 'gpt-4o-mini'
-# process_all_links(language, model)
-overwrite_metadata(language, model)
+if __name__ == "__main__":
+    language = 'german'
+    model = 'gpt-4o-mini'
+    overwrite_metadata(language, model)
