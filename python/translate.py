@@ -1,8 +1,10 @@
 import json
 import os
 import openai
+import anthropic
 from countWords import *
 import argparse
+from metadata import overwrite_metadata
 
 originalDirectory = './essaysMDenglish'
 
@@ -22,7 +24,7 @@ if TARGET_LANGUAGE not in supported_languages:
 try: 
     MODEL_NAME = {
         1: "gpt-4o-mini",
-        2: "claude-3-haiku",
+        2: "claude-3-haiku-20240307",
         3: "llama-3-7b",
     }[args.model]
 except KeyError:
@@ -31,13 +33,11 @@ except KeyError:
 
 LLM_PROVIDER = {
     "gpt-4o-mini": "openai",
-    "claude-3-haiku": "anthropic",
+    "claude-3-haiku-20240307": "anthropic",
     "llama-3-7b": "meta"
 }[MODEL_NAME]
 
 print(f"Translating to {args.language.capitalize()} with {MODEL_NAME}...")    
-
-client = openai.Client(api_key=os.environ.get("OPENAI_API_KEY"))
 
 def translate_markdown(content, target_language):
     """
@@ -51,33 +51,65 @@ def translate_markdown(content, target_language):
     prompt = f"Translate the following content to {target_language}.\
     The content is in markdown format, which must be preserved. That means keeping all of the links like this [[1](#f1n)] \
     Do not include any additional text, like ```markdown. \
+    Do not include any additional text like 'Here is the translation of the content:'. \
+    Do not add anything to the beginning or end of the content. It MUST start with the metadata. \
+    The metadata keys are: title, date. \
+    The metadata keys MUST NOT be translated. \
+    The metadata title MUST be translated. I repeat, you MUST translate the value of the title: field \
+    If there is no content beyond the metadata, the translation should be empty. Don't return anything \
     \n\nContent: {content}"
-    
-    try:
-        response = client.chat.completions.create(
-            model=MODEL_NAME, 
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.0,
-            stream=True
-        )
 
-        collected_messages = []
+    if LLM_PROVIDER == "openai":
+        client = openai.Client(api_key=os.environ.get("OPENAI_API_KEY"))
+        try:
+            response = client.chat.completions.create(
+                model=MODEL_NAME, 
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.0,
+                stream=True
+            )
 
-        for chunk in response:
-            chunk_message = chunk.choices[0].delta.content
-            print(chunk_message, end="", flush=True)
-            collected_messages.append(chunk_message)
+            collected_messages = []
 
-        collected_messages = [m for m in collected_messages if m is not None]
-        translation = "".join(collected_messages)
-        return translation
-    except Exception as e:
-        print(f"Error during translation: {e}")
-        return None
+            for chunk in response:
+                chunk_message = chunk.choices[0].delta.content
+                print(chunk_message, end="", flush=True)
+                collected_messages.append(chunk_message)
+
+            collected_messages = [m for m in collected_messages if m is not None]
+            translation = "".join(collected_messages)
+            return translation
+        
+        except Exception as e:
+            print(f"Error during translation: {e}")
+            return None
+        
+    elif LLM_PROVIDER == "anthropic":
+        client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+        try:
+            collected_messages = []
+
+            with client.messages.stream(
+                system="You are a world-class translator.",
+                messages=[{"role": "user", "content": prompt}],
+                model=MODEL_NAME,
+                temperature=0,
+                max_tokens=4096,
+            ) as stream:
+                
+                for text in stream.text_stream:
+                    print(text, end="", flush=True)
+                    collected_messages.append(text)
+
+            collected_messages = [m for m in collected_messages if m is not None]
+            translation = "".join(collected_messages)
+            return translation
+        
+        except Exception as e:
+            print(f"Error during translation: {e}")
+            return None
 
 def translate_all_markdown_files(target_language):
-    # TODO: PARALLELIZE THIS
-
     if not os.path.exists(originalDirectory):
         print(f"Directory {originalDirectory} does not exist.")
         return
@@ -103,7 +135,7 @@ def translate_all_markdown_files(target_language):
             translated_content = translate_markdown(content, target_language)
             
             if translated_content:
-                translated_file_path = os.path.join(output_directory, f"{filename[:-3]}_{target_language}.md")
+                translated_file_path = os.path.join(output_directory, filename)
                 with open(translated_file_path, 'w', encoding='utf-8') as translated_file:
                     translated_file.write(translated_content)
                 
@@ -142,7 +174,8 @@ def translate_one_markdown_file(target_language, file_name):
     print("Translation process completed.")
 
 if __name__ == "__main__":
-    translate_one_markdown_file(TARGET_LANGUAGE.capitalize(), "foundermode.md")
-    # # translate shortest 100 files
-    # for essay in shortest_100_essays():
-    #     translate_one_markdown_file(TARGET_LANGUAGE.capitalize(), essay)
+    # translate shortest 20 files
+    for i, essay in enumerate(shortest_100_essays()):
+        print(f"\n{i} Translating {essay}...")
+        translate_one_markdown_file(TARGET_LANGUAGE.capitalize(), essay)
+    overwrite_metadata(TARGET_LANGUAGE.lower(), MODEL_NAME)
