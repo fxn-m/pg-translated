@@ -174,14 +174,6 @@ def translate_one_markdown_file(target_language, file_name):
 
     print("Translation process completed.")
 
-# if __name__ == "__main__":
-#     # translate shortest 20 files
-#     for i, essay in enumerate(shortest_100_essays()):
-#         print(f"\n{i} Translating {essay}...")
-#         translate_one_markdown_file(TARGET_LANGUAGE.capitalize(), essay)
-#     overwrite_metadata(TARGET_LANGUAGE.lower(), MODEL_NAME)
-
-
 BATCH_SIZE = 5
 
 def translate_batch(file_batch, target_language, output_directory):
@@ -218,8 +210,6 @@ def translate_all_markdown_files_in_batches(target_language):
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
 
-    # markdown_files = [f for f in os.listdir(originalDirectory) if f.endswith(".md")]
-    # ! Sort by length of content
     markdown_files = list(sort_essays_by_length())
 
     file_batches = [markdown_files[i:i + BATCH_SIZE] for i in range(0, len(markdown_files), BATCH_SIZE)]
