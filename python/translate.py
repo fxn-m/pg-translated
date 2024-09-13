@@ -53,7 +53,7 @@ def translate_markdown(content, target_language):
     The content is in markdown format, which must be preserved. That means keeping all of the links like this [[1](#f1n)] \
     Do not include any additional text, like ```markdown. \
     Do not include any additional text like 'Here is the translation of the content:'. \
-    Do not add anything to the beginning or end of the content. It MUST start with the metadata. \
+    Do not add anything to the beginning or end of the content. If there is --- style metadata, it MUST start with the metadata. \
     The metadata keys are: title, date. \
     The metadata keys MUST NOT be translated. \
     The metadata title MUST be translated. I repeat, you MUST translate the value of the title: field \
@@ -67,7 +67,8 @@ def translate_markdown(content, target_language):
                 model=MODEL_NAME, 
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.0,
-                stream=True
+                stream=True,
+                max_tokens=16384,
             )
 
             collected_messages = []
