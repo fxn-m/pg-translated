@@ -7,7 +7,7 @@ import { essays } from "@/db/schema"
 import path from "path"
 import yaml from "js-yaml"
 
-const fileName = "" // * if uploading a specific file
+const fileName = "" // * if uploading a specific file for testing
 
 async function uploadEssays(uploadedFiles: string[], language: SupportedLanguage, model: string) {
   const essayDirectory = path.join(__dirname, "../python/essaysMD" + language + `${language !== "english" ? "-" + model : ""}`)
