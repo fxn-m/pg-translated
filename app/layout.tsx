@@ -1,5 +1,6 @@
 import "./globals.css"
 
+import { Analytics } from "@vercel/analytics/react"
 import { Inter } from "next/font/google"
 import LanguageSelector from "@/components/LanguageSelector"
 import type { Metadata } from "next"
@@ -60,6 +61,7 @@ export default function RootLayout({
         </div>
         <Suspense>{children}</Suspense>
       </body>
+      <Analytics />
     </html>
   )
 }
