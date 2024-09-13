@@ -22,8 +22,6 @@ export default function LanguageSelector() {
 
   const [lang, shortTitle = "", model] = pathname.split("/").filter(Boolean).slice(1)
 
-  console.log("params", params)
-
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -65,7 +63,7 @@ export default function LanguageSelector() {
               <Link
                 key={language.code}
                 href={
-                  params.get("lang")
+                  pathname === "/"
                     ? `/?lang=${language.code}`
                     : `/essays/${language.code}/${shortTitle}/${model ? (model !== "gpt-4o-mini" && language.code === "english" ? "" : model) : ""}`
                 }
