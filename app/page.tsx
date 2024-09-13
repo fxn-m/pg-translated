@@ -5,21 +5,24 @@ import { Suspense } from "react"
 import { Typewriter } from "react-simple-typewriter"
 import { useSearchParams } from "next/navigation"
 
-const languageData: Record<string, { translation: string; flag: string }> = {
-  english: { translation: "essays", flag: "🇬🇧" },
-  french: { translation: "essais", flag: "🇫🇷" },
-  spanish: { translation: "ensayos", flag: "🇪🇸" },
-  german: { translation: "aufsätze", flag: "🇩🇪" }
+const languageData: Record<string, { translation: string; flag: string; name: string; code: string }> = {
+  english: { name: "English", code: "EN", translation: "essays", flag: "🇬🇧" },
+  french: { name: "Français", code: "FR", translation: "essais", flag: "🇫🇷" },
+  spanish: { name: "Español", code: "ES", translation: "ensayos", flag: "🇪🇸" },
+  german: { name: "Deutsch", code: "DE", translation: "aufsätze", flag: "🇩🇪" }
 }
+
+const LanguageIndicator = ({ language }: { language: keyof typeof languageData }) => (
+  <div className="text-lg">
+    <span className="text-gray-400">[</span>
+    <span className="font-medium">{languageData[language].name}</span>
+    <span className="ml-1 text-sm text-gray-500">{languageData[language].code}</span>
+    <span className="text-gray-400">]</span>
+  </div>
+)
 
 const languages = Object.keys(languageData)
 const translations = [...languages.map((lang) => languageData[lang].translation), "essays - translated"]
-
-const ElevatedFlag = ({ language }: { language: string }) => (
-  <div className="inline-flex h-12 w-12 cursor-default items-center justify-center rounded-full text-xl shadow-md transition-shadow duration-300 hover:shadow-lg dark:bg-slate-800">
-    {languageData[language].flag}
-  </div>
-)
 
 export default function Home() {
   const searchParams = useSearchParams()
@@ -41,9 +44,10 @@ export default function Home() {
                 )}
               </span>
             </h1>
-            {isValidLanguage && <ElevatedFlag language={language} />}
+            {isValidLanguage && <LanguageIndicator language={language} />}
           </div>
         </Suspense>
+
         <footer className="mt-8 max-w-2xl text-xs text-gray-500">
           <p className="mb-4">
             None of the content on this website is my own. All essays are written by Paul Graham and are reproduced here for educational and informational

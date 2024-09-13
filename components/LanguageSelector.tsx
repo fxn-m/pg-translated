@@ -1,10 +1,10 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { usePathname, useSearchParams } from "next/navigation"
 
 import { ChevronDown } from "lucide-react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
 
 const languages = [
   { code: "english", flag: "🇬🇧", translation: "English" },
@@ -18,8 +18,11 @@ export default function LanguageSelector() {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
+  const params = useSearchParams()
 
   const [lang, shortTitle = "", model] = pathname.split("/").filter(Boolean).slice(1)
+
+  console.log("params", params)
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -34,10 +37,6 @@ export default function LanguageSelector() {
     }
   }, [])
 
-  if (lang === undefined) {
-    return null
-  }
-
   return (
     <div className="inline-block text-left" ref={dropdownRef}>
       <div>
@@ -49,7 +48,7 @@ export default function LanguageSelector() {
           aria-haspopup="true"
           onClick={() => setIsOpen(!isOpen)}
         >
-          {languages.find((language) => language.code === lang)?.flag || "🌐"}
+          {languages.find((language) => language.code === (lang || params.get("lang")))?.flag || "🌐"}
           <ChevronDown className={`-mr-1 h-5 w-5 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""} dark:text-gray-300`} aria-hidden="true" />
         </button>
       </div>
@@ -65,7 +64,11 @@ export default function LanguageSelector() {
             {languages.map((language) => (
               <Link
                 key={language.code}
-                href={`/essays/${language.code}/${shortTitle}/${model ? model : ""}`}
+                href={
+                  params.get("lang")
+                    ? `/?lang=${language.code}`
+                    : `/essays/${language.code}/${shortTitle}/${model ? (model !== "gpt-4o-mini" && language.code === "english" ? "" : model) : ""}`
+                }
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
                 role="menuitem"
                 tabIndex={-1}
