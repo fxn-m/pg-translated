@@ -1,6 +1,15 @@
 import urllib.request
 from bs4 import BeautifulSoup
 import os
+import sys
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-debug", "--debug", help="Debug mode.", type=int)
+args = parser.parse_args()
+
+if args.debug:
+    print("\033[33m" + "\nDebug mode on." + "\033[0m")
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -39,15 +48,17 @@ def scrapeEssay(link, title):
     
     return essay
 
-page = urllib.request.urlopen('http://www.paulgraham.com/articles.html').read()
-soup = BeautifulSoup(page, 'html.parser')
-soup.prettify()
-articles = soup.findAll('table', {'width': '435'})
+if not os.path.exists("./articles.html"):
+    print("\nFetching articles list...")
+    page = urllib.request.urlopen('http://www.paulgraham.com/articles.html').read()
+    soup = BeautifulSoup(page, 'html.parser')
+    soup.prettify()
+    articles = soup.findAll('table', {'width': '435'})
 
-# save articles to file
-with open('articles.html', 'w') as file:
-    file.write(str(articles))
-    print("articles.html written")
+    # save articles to file
+    with open('articles.html', 'w') as file:
+        file.write(str(articles))
+        print("articles.html written")
 
 # read articles from file
 with open('articles.html', 'r') as file:
@@ -58,23 +69,36 @@ soup.prettify()
 
 links = soup.findAll('a')
 
+essays_list = []
+problematic_files = ["polls.html", "foundervisa.html"]
+
 for i, link in enumerate(links):
-     # skip essays that have already been scraped
-    if os.path.exists(CURRENT_DIR + '/essays/' + link.text + '.html'):
-        print("%d file already exists: %s" % (i, link.text))
+    title = link.text
+    href = link['href']
+
+    if args.debug and href not in problematic_files:
         continue
 
-    title = link.text
- 
-    if '/' in link.text:
-        title = link.text.replace('/', '-')
+    if not '.html' in href:
+        continue
 
+    destination = CURRENT_DIR + '/essaysHTML/' + href
+    essays_list.append(href)
 
-    essay = scrapeEssay(link['href'], link.text)
+    if not args.debug and os.path.exists(destination):
+        print("%d file already exists: %s" % (i, href))
+        continue
 
+    essay = scrapeEssay(href, title)
 
-    with open(CURRENT_DIR + '/essays/' + title + '.html', 'w') as file:
+    print(essay)
+
+    with open(destination, 'w') as file:
         for p in essay:
             file.write(p)
             file.write("\n\n")
-        print("file written: %s" % link.text)
+        print("file written: %s" % title)
+
+print("Total number of links:", len(essays_list))
+print("Total number of unique links:", len((set(essays_list))))
+print("")
