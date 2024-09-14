@@ -11,6 +11,8 @@ import remarkRehype from "remark-rehype"
 import { type SupportedLanguage, supportedLanguages } from "@/db/schema"
 import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
+import { notFound } from "next/navigation"
+import Error from "@/app/error"
 
 function ExternalLinkComponent({ short_title }: { short_title: string }) {
   return (
@@ -44,7 +46,7 @@ export default async function Page({ params }: { params: { lang: string; slug: s
   const language = lang.toLowerCase() as SupportedLanguage // ! BAD: This is a hack to get the type of the enum values
 
   if (!supportedLanguages.includes(language)) {
-    return <div>Invalid language</div>
+    return <Error message="Invalid language" reset={() => {}} />
   }
 
   const shortTitle = rawShortTitle.replace(/%20/g, " ")
@@ -52,6 +54,10 @@ export default async function Page({ params }: { params: { lang: string; slug: s
     .select()
     .from(essays)
     .where(and(eq(essays.translationModel, model), and(eq(essays.short_title, shortTitle), eq(essays.language, language))))
+
+  if (!essay) {
+    notFound()
+  }
 
   const parsedContent = await remark()
     .use(gfm)

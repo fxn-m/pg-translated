@@ -38,7 +38,9 @@ export default function Home() {
               <span>Paul Graham&apos;s&nbsp;</span>
               <span className="relative font-mono text-blue-600">
                 {isValidLanguage ? (
-                  <Link href={`/essays/${language}`}>{languageData[language].translation}</Link>
+                  <Link className="hover:underline" href={`/essays/${language}`}>
+                    {languageData[language].translation}
+                  </Link>
                 ) : (
                   <Typewriter words={translations} loop={1} typeSpeed={100} deleteSpeed={50} delaySpeed={2000} />
                 )}
@@ -56,9 +58,9 @@ export default function Home() {
           </p>
           <p>
             For the official source of these brilliant essays, please visit{" "}
-            <a className="text-sky-700 hover:underline" href="https://paulgraham.com" target="_blank" rel="noopener noreferrer">
+            <Link className="text-sky-700 hover:underline" href="https://paulgraham.com" target="_blank" rel="noopener noreferrer">
               paulgraham.com
-            </a>
+            </Link>
             .
           </p>
         </footer>

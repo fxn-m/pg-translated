@@ -3,6 +3,7 @@ import { eq, and } from "drizzle-orm"
 import { essays } from "@/db/schema"
 import { type SupportedLanguage, supportedLanguages } from "@/db/schema"
 import Link from "next/link"
+import Error from "@/app/error"
 
 // Return a list of `params` to populate the [slug] dynamic segment
 export const generateStaticParams = async () =>
@@ -12,6 +13,10 @@ export const generateStaticParams = async () =>
 
 export default async function Page({ params }: { params: { lang: string } }) {
   const language = params.lang
+
+  if (!supportedLanguages.includes(language as SupportedLanguage)) {
+    return <Error message="Invalid language" />
+  }
 
   const essayArray = await db
     .select()
