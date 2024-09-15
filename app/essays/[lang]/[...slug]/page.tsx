@@ -1,7 +1,7 @@
-import { and, count, eq } from "drizzle-orm"
+import { and, eq } from "drizzle-orm"
 
 import { db } from "@/db"
-import { essays, feedback } from "@/db/schema"
+import { essays } from "@/db/schema"
 import gfm from "remark-gfm"
 import rehypeRaw from "rehype-raw"
 import rehypeStringify from "rehype-stringify"
@@ -69,34 +69,6 @@ export default async function Page({ params }: { params: { lang: string; slug: s
     .process(essay.content)
   const contentHtml = parsedContent.toString()
 
-  const feedbackCounts = await db
-    .select({ feedbackType: feedback.feedback_type, count: count() })
-    .from(feedback)
-    .where(eq(feedback.essay_id, essay.id))
-    .groupBy(feedback.feedback_type)
-
-  // Initialize counts with zeros
-  const counts = {
-    likes: 0,
-    dislikes: 0,
-    errors: 0
-  }
-
-  // Map the feedbackCounts to the counts object
-  feedbackCounts.forEach((item) => {
-    switch (item.feedbackType) {
-      case "like":
-        counts.likes = item.count
-        break
-      case "dislike":
-        counts.dislikes = item.count
-        break
-      case "error":
-        counts.errors = item.count
-        break
-    }
-  })
-
   return (
     <div className="items-center justify-items-center pb-8 font-geistSans">
       <main className="row-start-2 text-sm sm:items-start">
@@ -106,7 +78,7 @@ export default async function Page({ params }: { params: { lang: string; slug: s
             <ExternalLinkComponent short_title={essay.short_title} />
             <div className="max-w-2xl space-y-4 font-verdana md:w-2/3 lg:w-1/2" dangerouslySetInnerHTML={{ __html: contentHtml }} />
           </div>
-          <Feedback counts={counts} essayId={essay.id} />
+          <Feedback essayId={essay.id} />
         </div>
       </main>
     </div>
