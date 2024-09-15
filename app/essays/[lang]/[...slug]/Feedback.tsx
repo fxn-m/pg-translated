@@ -1,7 +1,7 @@
 "use client"
 
 import { AlertCircle, ThumbsDown, ThumbsUp } from "lucide-react"
-import { getFeedbackCounts, submitFeedback } from "@/actions"
+import { getFeedback, submitFeedback } from "@/actions"
 import { useEffect, useState, useTransition } from "react"
 
 import clsx from "clsx"
@@ -16,7 +16,7 @@ const FeedbackButton = ({
   isDisabled,
   count,
   feedbackSent,
-  selectedFeedbackType // Added this line
+  selectedFeedbackType
 }: {
   type: string
   Icon: React.ComponentType<{ className: string }>
@@ -26,7 +26,7 @@ const FeedbackButton = ({
   isDisabled: boolean
   count: number
   feedbackSent: boolean
-  selectedFeedbackType: string | null // Added this line
+  selectedFeedbackType: string | null
 }) => (
   <button
     key={type}
@@ -57,7 +57,7 @@ export default function Feedback({ essayId }: { essayId: number }) {
 
   useEffect(() => {
     async function loadFeedbackCounts() {
-      const counts = await getFeedbackCounts(essayId)
+      const counts = await getFeedback(essayId)
       setLocalCounts(counts)
     }
 
