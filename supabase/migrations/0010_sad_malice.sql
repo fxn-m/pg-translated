@@ -1,0 +1,1 @@
+ALTER TABLE "essays" ALTER COLUMN "translated_title" SET NOT NULL;

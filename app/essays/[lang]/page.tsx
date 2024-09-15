@@ -27,21 +27,49 @@ export default async function Page({ params }: { params: { lang: string } }) {
     return <div>There are no essays in this language</div>
   }
 
+  const essaysByYear = essayArray.reduce(
+    (acc, essay) => {
+      const year = new Date(essay.date_written).getFullYear()
+      if (!acc[year]) {
+        acc[year] = []
+      }
+      acc[year].push(essay)
+      return acc
+    },
+    {} as Record<string, typeof essayArray>
+  )
+
+  const years = Object.keys(essaysByYear).sort((a, b) => Number(b) - Number(a))
+
   return (
     <div className="flex flex-grow flex-col pb-8">
-      <main className="flex flex-col space-y-2">
-        {essayArray
-          .sort((a, b) => new Date(b.date_written).getTime() - new Date(a.date_written).getTime())
-          .map((essay) => (
-            <div key={essay.id} className="flex flex-col">
-              <p>
-                <Link className="text-m text-blue-600 visited:text-gray-400 hover:underline" href={`/essays/${language}/${essay.short_title}`}>
-                  {essay.title}
-                </Link>
-              </p>
-              <p className="text-sm text-gray-500">{essay.translated_title}</p>
+      <main className={`flex flex-col space-y-${language === "english" ? "1" : "4"}`}>
+        {years.map((year) => (
+          <div key={year}>
+            {year != "1969" && (
+              <h2 className="sm:text-md mb-2 mt-4 border-b border-b-slate-200 pb-1 text-sm font-bold text-stone-600 dark:border-b-slate-600 dark:text-stone-400">
+                {year}
+              </h2>
+            )}
+            <div className="flex flex-col space-y-2">
+              {essaysByYear[year]
+                .sort((a, b) => new Date(b.date_written).getTime() - new Date(a.date_written).getTime())
+                .map((essay) => (
+                  <div key={essay.id} className="flex flex-col">
+                    <p>
+                      <Link
+                        className={`text-md text-blue-600 visited:text-gray-400 hover:underline sm:${language === "english" ? "text-md" : "text-lg"} dark:text-blue-500`}
+                        href={`/essays/${language}/${essay.short_title}`}
+                      >
+                        {essay.translated_title}
+                      </Link>
+                    </p>
+                    {language !== "english" && <p className="text-sm text-gray-500">{essay.title}</p>}
+                  </div>
+                ))}
             </div>
-          ))}
+          </div>
+        ))}
       </main>
     </div>
   )

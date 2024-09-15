@@ -58,7 +58,7 @@ export default function Home() {
           </p>
           <p>
             For the official source of these brilliant essays, please visit{" "}
-            <Link className="text-sky-700 hover:underline" href="https://paulgraham.com" target="_blank" rel="noopener noreferrer">
+            <Link className="text-blue-600 hover:underline" href="https://paulgraham.com" target="_blank" rel="noopener noreferrer">
               paulgraham.com
             </Link>
             .
