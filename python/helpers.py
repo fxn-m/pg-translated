@@ -149,28 +149,32 @@ def find_delta(lang, model):
     return delta
 
 if __name__ == "__main__":
-    lang = 'french'
-    model = "claude-3-haiku"
+    lang = 'german'
+    # model = "claude-3-haiku"
+    model = "gpt-4o-mini"
 
     count_translations()
 
-    # if len(sys.argv) > 2:
-    #     if sys.argv[1] == 'delete':
-    #         file = sys.argv[2] + '.md'
+    if len(sys.argv) > 2:
+        if sys.argv[1] == 'delete':
+            file = sys.argv[2] + '.md'
 
-    #         print(len(sys.argv))
-    #         if len(sys.argv) > 3:
-    #             delete_files(file, sys.argv[3])
+            print(len(sys.argv))
+            if len(sys.argv) > 3:
+                delete_files(file, sys.argv[3])
 
-    #         else:
-    #             delete_files(file)
+            else:
+                delete_files(file)
 
-    # else:
-    #     delta = find_delta(lang, model)
-    #     print("\nEssays that do not meet the 15% threshold")
-    #     pretty_print(delta)         
+    else:
+        delta = find_delta(lang, model)
+        print("\nEssays that do not meet the 15% threshold")
+        if len(delta):
+            pretty_print(delta)
+        else:
+            print('\033[92m'+ "All essays meet the 15% threshold\n" + '\033[0m')      
 
-    #     # for each essay in delta, delete the translated file from all folders starting with essaysMD, containing the model
-    #     for essay in delta:
-    #         delete_files(essay, model)
-    #         print(f"Deleted {essay} from all folders starting with 'essaysMD' containing the model {model}")
+    # #     # for each essay in delta, delete the translated file from all folders starting with essaysMD, containing the model
+    # #     for essay in delta:
+    # #         delete_files(essay, model)
+    # #         print(f"Deleted {essay} from all folders starting with 'essaysMD' containing the model {model}")
