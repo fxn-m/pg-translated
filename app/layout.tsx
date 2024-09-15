@@ -63,9 +63,9 @@ export default function RootLayout({
         </div>
         <Suspense>{children}</Suspense>
         <Toaster />
+        <SpeedInsights />
       </body>
       <Analytics />
-      <SpeedInsights />
     </html>
   )
 }

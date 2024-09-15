@@ -1,7 +1,5 @@
 "use client"
 
-import "/node_modules/flag-icons/css/flag-icons.min.css"
-
 import { useEffect, useRef, useState } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
 
