@@ -11,6 +11,12 @@ def convert_html_to_markdown(html_content: str) -> str:
     for center_tag in soup.find_all('center'):
         center_tag.unwrap()
 
+    # add ``` to where <pre> tags are
+    for pre_tag in soup.find_all('pre'):
+        pre_tag.insert_before('```\n')
+        pre_tag.insert_after('\n```')
+        pre_tag.unwrap()
+
     # Handle both footnote-like <a name="..."> and regular <a href="...">
     for a_tag in soup.find_all('a'):
         # Handle footnotes with the 'name' attribute

@@ -114,12 +114,12 @@ def overwrite_metadata(lang, model="gpt-4o-mini"):
                 print(f"\033[91mNo metadata found in the translated file for {filename}\033[0m")
                 error_count += 1
 
-                # remove the first two lines of the file
-                with open(file_path, 'r', encoding='utf-8') as file:
-                    lines = file.readlines()
-                    lines = lines[2:]
-                with open(file_path, 'w', encoding='utf-8') as file:
-                    file.writelines(lines)
+                # # remove the first two lines of the file (removes any pre-amble added by the translation tool)
+                # with open(file_path, 'r', encoding='utf-8') as file:
+                #     lines = file.readlines()
+                #     lines = lines[2:]
+                # with open(file_path, 'w', encoding='utf-8') as file:
+                #     file.writelines(lines)
 
                 continue
 

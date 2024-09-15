@@ -5,7 +5,10 @@ import anthropic
 import argparse
 from metadata import overwrite_metadata
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from helpers import sort_essays_by_length, shortest_100_essays
+from helpers import sort_essays_by_length
+import tiktoken
+import re
+
 
 originalDirectory = './essaysMDenglish'
 
@@ -38,6 +41,11 @@ LLM_PROVIDER = {
     "llama-3-7b": "meta"
 }[MODEL_NAME]
 
+MODEL_CONTEXT_LENGTHS = {
+    "gpt-4o-mini": 8000,
+    "claude-3-haiku-20240307": 1000,
+}
+
 print(f"Translating to {args.language.capitalize()} with {MODEL_NAME}...")    
 
 def translate_markdown(content, target_language):
@@ -49,67 +57,159 @@ def translate_markdown(content, target_language):
     target_language (str): The target language to translate the content to.
     """
 
-    prompt = f"Translate the following content to {target_language}.\
-    The content is in markdown format, which must be preserved. That means keeping all of the links like this [[1](#f1n)] \
-    Do not include any additional text, like ```markdown. \
-    Do not include any additional text like 'Here is the translation of the content:'. \
-    Do not add anything to the beginning or end of the content. If there is --- style metadata, it MUST start with the metadata. \
-    The metadata keys are: title, date. \
-    The metadata keys MUST NOT be translated. \
-    The metadata title MUST be translated. I repeat, you MUST translate the value of the title: field \
-    If there is no content beyond the metadata, the translation should be empty. Don't return anything \
-    \n\nContent: {content}"
-
-    if LLM_PROVIDER == "openai":
-        client = openai.Client(api_key=os.environ.get("OPENAI_API_KEY"))
-        try:
-            response = client.chat.completions.create(
-                model=MODEL_NAME, 
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.0,
-                stream=True,
-                max_tokens=16384,
-            )
-
-            collected_messages = []
-
-            for chunk in response:
-                chunk_message = chunk.choices[0].delta.content
-                print(chunk_message, end="", flush=True)
-                collected_messages.append(chunk_message)
-
-            collected_messages = [m for m in collected_messages if m is not None]
-            translation = "".join(collected_messages)
-            return translation
+    def estimate_tokens(text, model_name):
+        if model_name.startswith("gpt-"):
+            encoding = tiktoken.encoding_for_model(model_name)
+        else:
+            encoding = tiktoken.get_encoding("cl100k_base")
+        tokens = encoding.encode(text)
+        return len(tokens)
         
-        except Exception as e:
-            print(f"Error during translation: {e}")
-            return None
-        
-    elif LLM_PROVIDER == "anthropic":
-        client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
-        try:
-            collected_messages = []
+    def split_content_into_chunks(content, max_chunk_tokens, model_name):
+        # Split content into paragraphs
+        paragraphs = re.split(r'(\n\s*\n)', content)  # Keep the delimiters
 
-            with client.messages.stream(
-                system="You are a world-class translator.",
-                messages=[{"role": "user", "content": prompt}],
-                model=MODEL_NAME,
-                temperature=0,
-                max_tokens=4096,
-            ) as stream:
+        chunks = []
+        current_chunk = ''
+        current_tokens = 0
+
+        for paragraph in paragraphs:
+            paragraph_tokens = estimate_tokens(paragraph, model_name)
+
+            if current_tokens + paragraph_tokens <= max_chunk_tokens:
+                current_chunk += paragraph
+                current_tokens += paragraph_tokens
+            else:
+                if current_chunk:
+                    chunks.append(current_chunk)
+                current_chunk = paragraph
+                current_tokens = paragraph_tokens
+
+        if current_chunk:
+            chunks.append(current_chunk)
+
+        for chunk in chunks:
+            print(f"Chunk length: {len(chunk)}")
+            print(f"Number of tokens in chunk: {estimate_tokens(chunk, model_name)}")
+
+        return chunks
+    
+    def translate_chunk(chunk, target_language, model, chunk_number):
+        if chunk_number == 0:
+            prompt = f"""Translate the following content to {target_language}:
+The content is in markdown format, which must be preserved. That means keeping all of the links like this [[1](#f1n)]
+If there is HTML in the content, it must be preserved.
+Do not add any extra templating text, like '```markdown', or '```'.
+
+If there ARE three backticks in the content ```, they MUST be preserved as they are. If there is no closing backtick, do not add one.
+Do not add any additional text like 'Here is the translation of the content:'.
+Do not add ANYTHING to the beginning or end of the content. 
+
+If there is --- style metadata, it MUST start with the metadata.
+The metadata keys are: title, date.
+The metadata keys MUST NOT be translated.
+The metadata title MUST be translated. I repeat, you MUST translate the value of the 'title' field
+\n\nContent:\n
+{chunk}
+\n\n End of content.
+
+Now remember, you must translate the content above to {target_language}. DO NOT ADD ANYTHING TO THE TRANSLATION. JUST TRANSLATE ALL OF THE CONTENT AND RETURN EXACTLY THAT.
+KEEP ALL OF THE MARKDOWN AND HTML TAGS FORMATTED CORRECTLY.
+Remember, you MUST translate the value of the 'title' field in the metadata. Start the translation with the metadata.
+
+Translation:
+            """
+
+        else:
+            prompt = f"""Translate the following content to {target_language}:
+The content is in markdown format, which must be preserved. That means keeping all of the links like this [[1](#f1n)]
+If there is HTML in the content, it must be preserved.
+Do not add any extra templating text, like '```markdown', or '```'.
+If there ARE three backticks in the content ```, they MUST be preserved as they are. If there is no closing backtick, do not add one.
+Do not add any additional text like 'Here is the translation of the content:'.
+Do not add ANYTHING to the beginning or end of the content.
+DO NOT ADD ANYTHING TO THE BEGINNING OR END OF THE CONTENT. JUST TRANSLATE THE CONTENT AND RETURN EXACTLY THAT.
+
+\n\nContent:\n 
+{chunk}
+\n\n End of content.
+
+Now remember, you must translate the content above to {target_language}. DO NOT ADD ANYTHING TO THE TRANSLATION. JUST TRANSLATE THE CONTENT AND RETURN EXACTLY THAT.
+KEEP ALL OF THE MARKDOWN AND HTML TAGS FORMATTED CORRECTLY.
+
+Translation:
+            """
+
+        print(f"\n\nTranslating chunk {chunk_number}...")
+        print(f"\nPrompt: {prompt}")
+
+
+        if LLM_PROVIDER == "openai":
+            client = openai.Client(api_key=os.environ.get("OPENAI_API_KEY"))
+            try:
+                collected_messages = []
+                response = client.chat.completions.create(
+                    model=model, 
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.0,
+                    stream=True,
+                )
+
+                for chunk in response:
+                    chunk_message = chunk.choices[0].delta.content
+                    print(chunk_message, end="", flush=True)
+                    collected_messages.append(chunk_message)
+
+                collected_messages = [m for m in collected_messages if m is not None]
+                translation = "".join(collected_messages)
+                return translation
+
+            except Exception as e:
+                print(f"Error during translation: {e}")
+                return None
+
+        elif LLM_PROVIDER == "anthropic":
+            client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+            try:
+                collected_messages = []
+                with client.messages.stream(
+                    system="You are a world-class translator.",
+                    messages=[{"role": "user", "content": prompt}],
+                    model=model,
+                    temperature=0,
+                    max_tokens=4096,
+                ) as stream:
+
+                    for text in stream.text_stream:
+                        print(text, end="", flush=True)
+                        collected_messages.append(text)
                 
-                for text in stream.text_stream:
-                    print(text, end="", flush=True)
-                    collected_messages.append(text)
+                collected_messages = [m for m in collected_messages if m is not None]
+                translation = "".join(collected_messages)
+                return translation
 
-            collected_messages = [m for m in collected_messages if m is not None]
-            translation = "".join(collected_messages)
-            return translation
-        
-        except Exception as e:
-            print(f"Error during translation: {e}")
+            except Exception as e:
+                print(f"Error during translation: {e}")
+                return None
+    
+    max_chunk_tokens = MODEL_CONTEXT_LENGTHS.get(MODEL_NAME)
+
+    chunks = split_content_into_chunks(content, max_chunk_tokens, MODEL_NAME)
+    translated_chunks = []
+
+    for i, chunk in enumerate(chunks):
+        print('\033[92m' + f"\n\n\nTranslating chunk of length {len(chunk)}...\n" + '\033[0m')
+
+        print(f"Number of tokens in chunk: {estimate_tokens(chunk, MODEL_NAME)}")
+
+        translation = translate_chunk(chunk, target_language, MODEL_NAME, chunk_number=i)
+        if translation:
+            translated_chunks.append(translation)
+        else:
+            print("Failed to translate chunk.")
             return None
+        
+    return "\n\n".join(translated_chunks)
 
 def translate_all_markdown_files(target_language):
     if not os.path.exists(originalDirectory):
@@ -175,26 +275,22 @@ def translate_one_markdown_file(target_language, file_name):
 
     print("Translation process completed.")
 
-BATCH_SIZE = 5
+BATCH_SIZE = 10
 
 def translate_batch(file_batch, target_language, output_directory):
     for file_name in file_batch:
         file_path = os.path.join(originalDirectory, file_name)
         
-        # Skip if file already exists in the output directory
         if os.path.exists(os.path.join(output_directory, file_name)):
             print(f"Skipping {file_name} as it already exists in the output directory.")
             continue
         
-        # Read the markdown content
         with open(file_path, 'r', encoding='utf-8') as file:
             content = file.read()
         
-        # Translate the markdown content
         translated_content = translate_markdown(content, target_language)
 
         if translated_content:
-            # Save the translated content to the output directory
             translated_file_path = os.path.join(output_directory, file_name)
             with open(translated_file_path, 'w', encoding='utf-8') as translated_file:
                 translated_file.write(translated_content)
@@ -231,4 +327,6 @@ def translate_all_markdown_files_in_batches(target_language):
 
 if __name__ == "__main__":
     translate_all_markdown_files_in_batches(TARGET_LANGUAGE.capitalize())
+    # translate_one_markdown_file(TARGET_LANGUAGE.capitalize(), "revolution.md")
     overwrite_metadata(TARGET_LANGUAGE.lower(), MODEL_NAME)
+
