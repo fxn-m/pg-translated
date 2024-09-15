@@ -7,6 +7,7 @@ import type { Metadata } from "next"
 import ModelSelector from "@/components/ModelSelector"
 import Navigation from "@/components/Navigation"
 import { Suspense } from "react"
+import { Toaster } from "@/components/ui/toaster"
 import localFont from "next/font/local"
 
 const geistSans = localFont({
@@ -24,7 +25,7 @@ const geistMono = localFont({
 const verdana = localFont({
   src: "./fonts/Verdana.woff",
   variable: "--font-verdana",
-  weight: "100 900"
+  weight: "variable"
 })
 
 const inter = Inter({
@@ -60,6 +61,7 @@ export default function RootLayout({
           </div>
         </div>
         <Suspense>{children}</Suspense>
+        <Toaster />
       </body>
       <Analytics />
     </html>

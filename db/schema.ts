@@ -15,8 +15,7 @@ export const essays = pgTable(
     date_written: date("date_written").notNull(),
     language: languageEnum("language").notNull(),
     translationModel: varchar("translation_model").default("gpt-4o-mini"),
-    created_at: timestamp("created_at").defaultNow(),
-    likes: integer("likes").default(0)
+    created_at: timestamp("created_at").defaultNow()
   },
   (table) => {
     return {
@@ -25,3 +24,13 @@ export const essays = pgTable(
     }
   }
 )
+
+export const feedback = pgTable("feedback", {
+  id: serial("id").primaryKey(),
+  essay_id: integer("essay_id")
+    .references(() => essays.id)
+    .notNull(),
+  feedback_type: varchar("feedback_type").notNull(),
+  content: text("content"),
+  created_at: timestamp("created_at").defaultNow()
+})
