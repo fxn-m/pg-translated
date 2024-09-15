@@ -22,10 +22,6 @@ async function uploadEssays(uploadedFiles: string[], language: SupportedLanguage
       continue
     }
 
-    if (file == "polls.md" || file == "foundervisa.md") {
-      continue
-    }
-
     if (uploadedFiles.includes(file.split(".")[0])) {
       console.log(`${file} already uploaded!\n`)
       continue
@@ -78,7 +74,6 @@ async function uploadEssays(uploadedFiles: string[], language: SupportedLanguage
         content,
         date_written: date_written,
         language: language as SupportedLanguage,
-        likes: 0,
         translationModel: language !== "english" ? model : undefined
       })
       console.log(`${file} uploaded successfully!\n`)
@@ -95,6 +90,10 @@ const main = async () => {
       if (language === "english" && model === "claude-3-haiku-20240307") {
         continue
       }
+
+      // const language = "french"
+      // const model = "claude-3-haiku-20240307"
+      // const model = "gpt-4o-mini"
 
       const uploadedEssays = await db
         .select()
