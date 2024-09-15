@@ -1,6 +1,6 @@
 "use client"
 
-import { AlertCircle, ThumbsDown, ThumbsUp } from "lucide-react"
+import { AlertCircle, MessageCircle, ThumbsDown, ThumbsUp } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { getFeedback, submitFeedback } from "@/actions"
 import { useEffect, useRef, useState, useTransition } from "react"
@@ -49,7 +49,7 @@ const FeedbackButton = ({ type, Icon, label, handleFeedback, isDisabled, count, 
   return (
     <button
       className={clsx(
-        "flex w-full items-center justify-between gap-2 rounded-md px-3 py-2 transition-colors",
+        "flex w-full items-center justify-between rounded-md px-3 py-2 transition-colors",
         !isDisabled && ["hover:bg-gray-100", "dark:hover:bg-slate-600", colorClasses[type].hoverTextColor],
         isSelected ? colorClasses[type].textColor : "text-gray-600 dark:text-gray-500",
         isDisabled && "cursor-not-allowed"
@@ -58,11 +58,11 @@ const FeedbackButton = ({ type, Icon, label, handleFeedback, isDisabled, count, 
       disabled={isDisabled}
       aria-label={label}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex w-full items-center justify-between">
         <Icon className="h-6 w-6" aria-hidden="true" />
         <span className="text-sm">{label}</span>
+        <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium dark:bg-slate-800">{count}</span>
       </div>
-      <span className="ml-2 rounded-full bg-gray-100 px-2 py-1 text-xs font-medium dark:bg-slate-800">{count}</span>
     </button>
   )
 }
@@ -110,7 +110,7 @@ export default function Feedback({ essayId }: { essayId: number }) {
 
   const feedbackOptions: FeedbackOptionsType[] = [
     { type: "like", Icon: ThumbsUp, label: "Good" },
-    { type: "dislike", Icon: ThumbsDown, label: "Not good" },
+    { type: "dislike", Icon: ThumbsDown, label: "Poor" },
     { type: "error", Icon: AlertCircle, label: "Error" }
   ]
 
@@ -152,21 +152,22 @@ export default function Feedback({ essayId }: { essayId: number }) {
     label: string
   }
 
-  const utilities = "w-full dark:bg-gray-800 dark:text-gray-200 dark:ring-gray-600 dark:hover:bg-gray-700"
-
   return (
-    <div className="fixed bottom-4 right-4">
+    <div className="sm:fixed sm:bottom-4 sm:right-4">
       <Popover open={optionsOpen}>
         <PopoverTrigger asChild onClick={() => setOptionsOpen(true)}>
           <Button
-            className={clsx(["dark:border-slate-500 dark:bg-slate-900 dark:text-gray-200 dark:hover:bg-slate-800 dark:hover:text-gray-200"], utilities)}
+            className={
+              "h-14 w-14 rounded-full dark:border-slate-500 dark:bg-gray-800 dark:text-gray-200 dark:ring-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+            }
             variant="outline"
           >
-            Translation Feedback
+            <MessageCircle />
           </Button>
         </PopoverTrigger>
         <PopoverContent ref={feedbackRef} className="w-auto dark:border-slate-500 dark:bg-slate-900">
           <div className="flex flex-col space-y-2">
+            <p className="text-center text-sm font-semibold dark:text-gray-400">Translation Feedback</p>
             {feedbackOptions.map(({ type, Icon, label }) => (
               <FeedbackButton
                 key={type}

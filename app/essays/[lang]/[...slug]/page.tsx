@@ -71,15 +71,15 @@ export default async function Page({ params }: { params: { lang: string; slug: s
 
   return (
     <div className="items-center justify-items-center pb-8 font-geistSans">
-      <main className="row-start-2 text-sm sm:items-start">
+      <main className="row-start-2 space-y-8 text-sm sm:items-start">
         <div className="flex w-full flex-row">
           <div className="flex flex-grow flex-col gap-4">
             <h1 className="text-xl">{essay.title.toUpperCase()}</h1>
             <ExternalLinkComponent short_title={essay.short_title} />
-            <div className="max-w-2xl space-y-4 font-verdana md:w-2/3 lg:w-1/2" dangerouslySetInnerHTML={{ __html: contentHtml }} />
           </div>
-          <Feedback essayId={essay.id} />
+          {lang !== "english" && <Feedback essayId={essay.id} />}
         </div>
+        <div className="max-w-2xl space-y-4 font-verdana md:w-2/3 lg:w-1/2" dangerouslySetInnerHTML={{ __html: contentHtml }} />
       </main>
     </div>
   )
