@@ -72,8 +72,8 @@ export default async function Page({ params }: { params: { lang: string; slug: s
   return (
     <div className="items-center justify-items-center pb-8 font-geistSans">
       <main className="row-start-2 space-y-8 text-sm sm:items-start">
-        <div className="flex w-full flex-row">
-          <div className="flex flex-grow flex-col gap-4">
+        <div className="flex w-full flex-row justify-between">
+          <div className="flex flex-col gap-4">
             <h1 className="text-xl">{essay.title.toUpperCase()}</h1>
             <ExternalLinkComponent short_title={essay.short_title} />
           </div>

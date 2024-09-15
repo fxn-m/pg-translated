@@ -165,7 +165,7 @@ export default function Feedback({ essayId }: { essayId: number }) {
             <MessageCircle />
           </Button>
         </PopoverTrigger>
-        <PopoverContent ref={feedbackRef} className="w-auto dark:border-slate-500 dark:bg-slate-900">
+        <PopoverContent ref={feedbackRef} className="mx-2 w-auto dark:border-slate-500 dark:bg-slate-900">
           <div className="flex flex-col space-y-2">
             <p className="text-center text-sm font-semibold dark:text-gray-400">Translation Feedback</p>
             {feedbackOptions.map(({ type, Icon, label }) => (
