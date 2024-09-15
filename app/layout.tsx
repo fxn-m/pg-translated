@@ -6,6 +6,7 @@ import LanguageSelector from "@/components/LanguageSelector"
 import type { Metadata } from "next"
 import ModelSelector from "@/components/ModelSelector"
 import Navigation from "@/components/Navigation"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Suspense } from "react"
 import { Toaster } from "@/components/ui/toaster"
 import localFont from "next/font/local"
@@ -64,6 +65,7 @@ export default function RootLayout({
         <Toaster />
       </body>
       <Analytics />
+      <SpeedInsights />
     </html>
   )
 }
