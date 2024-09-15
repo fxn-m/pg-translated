@@ -62,7 +62,14 @@ export default function Feedback({ essayId }: { essayId: number }) {
     }
 
     loadFeedbackCounts()
+
+    console.log("Feedback component mounted")
+    console.log("Essay ID:", essayId)
   }, [essayId])
+
+  useEffect(() => {
+    console.log("Counts:", localCounts)
+  }, [localCounts])
 
   function handleFeedback(feedbackType: "like" | "dislike" | "error") {
     startTransition(async () => {
