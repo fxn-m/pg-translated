@@ -72,7 +72,6 @@ def overwrite_metadata(lang, model="gpt-4o-mini"):
     translated_dir = f"{CURRENT_DIR}/essaysMD{lang}-{model}"
     error_count = 0
 
-
     for filename in os.listdir(translated_dir):
         if filename.endswith(".md"):
             file_path = os.path.join(translated_dir, filename)
@@ -148,7 +147,43 @@ def overwrite_metadata(lang, model="gpt-4o-mini"):
 
     if error_count: print(f"\n{error_count} errors.")
 
+def remove_extra_metadata(lang, model="gemini-1.5-flash"):
+    """Remove extra metadata from translated .md files."""
+
+    translated_dir = f"{CURRENT_DIR}/essaysMD{lang}-{model}"
+    error_count = 0
+
+    for filename in os.listdir(translated_dir):
+        if filename.endswith(".md"):
+            file_path = os.path.join(translated_dir, filename)
+
+            # Read the translated file
+            with open(file_path, 'r', encoding='utf-8') as file:
+                translated_content = file.read()
+
+            # Find the first metadata block
+            match = re.search(r'^---.*?---', translated_content, re.DOTALL | re.MULTILINE)
+            if match:
+                first_metadata_block = match.group(0)
+                rest_of_content = translated_content[match.end():]
+
+                # Remove any subsequent metadata blocks
+                rest_of_content = re.sub(r'^---.*?---', '', rest_of_content, flags=re.DOTALL | re.MULTILINE)
+
+                # Reassemble the content
+                new_content = first_metadata_block + rest_of_content
+
+                # Write the cleaned content back to the file
+                with open(file_path, 'w', encoding='utf-8') as file:
+                    file.write(new_content)
+            else:
+                error_count += 1
+                print(f"No metadata block found in file: {filename}")
+
+    print(f"Processing complete. Number of files without metadata: {error_count}")
+
 if __name__ == "__main__":
-    language = 'french'
-    model = 'claude-3-haiku-20240307'
-    overwrite_metadata(language, model)
+    language = 'spanish'
+    model = 'gemini-1.5-flash'
+    # overwrite_metadata(language, model)
+    remove_extra_metadata(language, model)

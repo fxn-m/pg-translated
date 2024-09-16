@@ -3,7 +3,8 @@ import sys
 
 model_map = {
     'gpt-4o-mini': 'gpt-4o-mini',
-    'claude-3-haiku': 'claude-3-haiku-20240307'
+    'claude-3-haiku': 'claude-3-haiku-20240307',
+    'gemini-1.5-flash': 'gemini-1.5-flash',
     }
 
 def pretty_print(data, indent=4, level=0):
@@ -75,8 +76,12 @@ def count_words(file_name, lang, model=None):
         with open(f'./essaysMDenglish/{file_name}', 'r') as file:
             content = file.read()
     else:
-        with open(f'./essaysMD{lang}-{model}/{file_name}', 'r') as file:
-            content = file.read()
+        if os.path.exists(f'./essaysMD{lang}-{model}/{file_name}'):
+            with open(f'./essaysMD{lang}-{model}/{file_name}', 'r') as file:
+                content = file.read()
+        else:
+            print(f"\n{file_name} does not exist in {lang} for {model}. Skipping...")
+            return
 
     words = content.split()
     return len(words)
@@ -132,6 +137,8 @@ def find_delta(lang, model):
         original_essay = (original)[i]
         original_count = count_words(original_essay, 'english')
         translated_count = count_words(original_essay, lang, model)
+        if not translated_count:
+            continue
         delta[original_essay] = {"delta": translated_count - original_count, 
                                  "original_count": original_count,}
 
@@ -148,12 +155,33 @@ def find_delta(lang, model):
 
     return delta
 
+def copy_metadata_and_notice(lang, model):
+    with open("error.log", "r") as f:
+        file_names = f.read().splitlines()
+
+    for file_name in file_names:
+        if os.path.exists(f'./essaysMD{lang}-{model}/{file_name}'):
+            print(f"{file_name} already exists in {lang} for {model}. Skipping...")
+            continue
+
+        if input(f"Copy metadata and notice to {file_name} in {lang} for {model}? (yes: y, no: n) ").strip() != 'y':
+            continue
+
+        with open(f'./essaysMD{lang}-gpt-4o-mini/{file_name}', 'r') as file:
+            content = file.read()
+            metadata = content.split('---')[1]
+            print("Metadata:", metadata)
+        with open(f'./essaysMD{lang}-{model}/{file_name}', 'w') as new_file:
+            new_file.write(f'---{metadata}---\n')
+            new_file.write(f"It wasn't possible to translate this essay with {model}.\nPlease try again with a different model.\n")
+            print(f"Metadata and notice copied to {file_name}")
+
 if __name__ == "__main__":
     lang = 'german'
-    # model = "claude-3-haiku"
-    model = "gpt-4o-mini"
+    model = "gemini-1.5-flash"
 
     count_translations()
+    copy_metadata_and_notice(lang, model)
 
     if len(sys.argv) > 2:
         if sys.argv[1] == 'delete':
@@ -166,13 +194,15 @@ if __name__ == "__main__":
             else:
                 delete_files(file)
 
-    else:
-        delta = find_delta(lang, model)
-        print("\nEssays that do not meet the 15% threshold")
-        if len(delta):
-            pretty_print(delta)
-        else:
-            print('\033[92m'+ "All essays meet the 15% threshold\n" + '\033[0m')      
+    elif len(sys.argv) > 1:
+        if sys.argv[1] == 'delta':
+            print(f"\nFinding essays translated by {model} into {lang} that do not meet the 15% threshold")
+            delta = find_delta(lang, model)
+            print("\nEssays that do not meet the 15% threshold")
+            if len(delta):
+                pretty_print(delta)
+            else:
+                print('\033[92m'+ "All essays meet the 15% threshold\n" + '\033[0m')      
 
     # #     # for each essay in delta, delete the translated file from all folders starting with essaysMD, containing the model
     # #     for essay in delta:

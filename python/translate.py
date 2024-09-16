@@ -8,6 +8,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from helpers import sort_essays_by_length
 import tiktoken
 import re
+import google.generativeai as genai
+from google.generativeai.types import HarmCategory, HarmBlockThreshold
 
 
 originalDirectory = './essaysMDenglish'
@@ -29,7 +31,8 @@ try:
     MODEL_NAME = {
         1: "gpt-4o-mini",
         2: "claude-3-haiku-20240307",
-        3: "llama-3-7b",
+        3: "gemini-1.5-flash",
+        4: "llama-3-7b",
     }[args.model]
 except KeyError:
     print(f"Model {args.model} is not supported.")
@@ -38,19 +41,46 @@ except KeyError:
 LLM_PROVIDER = {
     "gpt-4o-mini": "openai",
     "claude-3-haiku-20240307": "anthropic",
-    "llama-3-7b": "meta"
+    "gemini-1.5-flash": "google",
+    "llama-3-7b": "meta",
 }[MODEL_NAME]
 
 MODEL_CONTEXT_LENGTHS = {
     "gpt-4o-mini": 8000,
     "claude-3-haiku-20240307": 1500,
+    "gemini-1.5-flash": 8000,
 }
 
 BATCH_SIZE = 1
+MAX_WORKERS = 6
+
+safety_settings = [
+    {
+        "category": HarmCategory.HARM_CATEGORY_HARASSMENT,
+        "threshold": HarmBlockThreshold.BLOCK_NONE
+    },
+    {
+        "category": HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        "threshold": HarmBlockThreshold.BLOCK_NONE,
+    },
+    {
+        "category": HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        "threshold": HarmBlockThreshold.BLOCK_NONE,
+    },
+    {
+        "category": HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        "threshold": HarmBlockThreshold.BLOCK_NONE,
+    },
+]
 
 print(f"Translating to {args.language.capitalize()} with {MODEL_NAME}...")    
 
-def translate_markdown_chunked(content, target_language):
+with open("error.log", "r") as f:
+    files_to_skip = f.read().splitlines()
+
+print(f"Files to skip: {files_to_skip}")
+
+def translate_markdown_chunked(content, target_language, file_name=None):
     """
     Translate the given markdown content to the target language.
 
@@ -58,6 +88,10 @@ def translate_markdown_chunked(content, target_language):
     content (str): The markdown content to translate.
     target_language (str): The target language to translate the content to.
     """
+
+    if file_name in files_to_skip:
+        print(f"\nSkipping {file_name} as it is in the error log.")
+        return None
 
     def estimate_tokens(text, model_name):
         if model_name.startswith("gpt-"):
@@ -115,11 +149,12 @@ The metadata keys MUST NOT be translated.
 The metadata title MUST be translated. I repeat, you MUST translate the value of the 'title' field
 \n\nContent:\n
 {chunk}
-\n\n End of content.
+\n\nEnd of content.
 
 Now remember, you must translate the content above to {target_language}. DO NOT ADD ANYTHING TO THE TRANSLATION. JUST TRANSLATE ALL OF THE CONTENT AND RETURN EXACTLY THAT.
 KEEP ALL OF THE MARKDOWN AND HTML TAGS FORMATTED CORRECTLY.
 Remember, you MUST translate the value of the 'title' field in the metadata. Start the translation with the metadata.
+Translate the date *after* the metadata to the target language as well.
 
 Translation:
             """
@@ -136,7 +171,7 @@ DO NOT ADD ANYTHING TO THE BEGINNING OR END OF THE CONTENT. JUST TRANSLATE THE C
 
 \n\nContent:\n 
 {chunk}
-\n\n End of content.
+\n\nEnd of content.
 
 Now remember, you must translate the content above to {target_language}. DO NOT ADD ANYTHING TO THE TRANSLATION. JUST TRANSLATE THE CONTENT AND RETURN EXACTLY THAT.
 KEEP ALL OF THE MARKDOWN AND HTML TAGS FORMATTED CORRECTLY.
@@ -168,7 +203,7 @@ Translation:
                 return translation
 
             except Exception as e:
-                print('\033[91m' + f"Error during translation: {e}" + '\033[0m')
+                print('\033[91m' + f"\nError during translation: {e}" + '\033[0m')
                 return None
 
         elif LLM_PROVIDER == "anthropic":
@@ -192,10 +227,80 @@ Translation:
                 return translation
 
             except Exception as e:
-                print('\033[91m' + f"Error during translation: {e}" + '\033[0m')
+                print('\033[91m' + f"\nError during translation: {e}" + '\033[0m')
+                return None
+            
+        elif LLM_PROVIDER == "google":
+        
+            prompt = f"""
+Translate the following content to {target_language}:
+The content is in markdown format, which must be preserved. That means keeping all of the links like this [[1](#f1n)]
+If there is HTML in the content, it must be preserved.
+Do not add any extra templating text, like '```markdown', or '```'.
+
+If there ARE three backticks in the content ```, they MUST be preserved as they are. If there is no closing backtick, do not add one.
+Do not add any additional text like 'Here is the translation of the content:'.
+Do not add ANYTHING to the beginning or end of the content. 
+
+If there is --- style metadata, it MUST start with the metadata.
+The metadata keys are: title, date.
+The metadata keys MUST NOT be translated.
+The metadata title MUST be translated. I repeat, you MUST translate the value of the 'title' field. 
+
+The content is between the line of asterisks. Do not keep any lines of asterisks in the translation.
+
+\n\nContent:
+*************************************************
+{chunk}
+*************************************************
+\n\n
+
+Now remember, you must translate the content above to {target_language}. DO NOT ADD ANYTHING TO THE TRANSLATION. JUST TRANSLATE ALL OF THE CONTENT AND RETURN EXACTLY THAT.
+KEEP ALL OF THE MARKDOWN AND HTML TAGS FORMATTED CORRECTLY.
+Remember, you MUST translate the value of the 'title' field in the metadata. Start the translation with the metadata.
+
+The content is between the line of asterisks. Do not keep any lines of asterisks in the translation.
+
+You are a world-class translator. Do not be harmful with your output. Just accurately translate.
+
+Note that there is not necessarily metadata. If there is no metadata, just translate the content. 
+
+THERE MAY NOT BE METADATA IN THE CONTENT. IF THERE IS NO METADATA, JUST TRANSLATE THE CONTENT, AND SKIP THE METADATA.
+
+Translation:
+"""
+            genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+            model = genai.GenerativeModel("gemini-1.5-flash")
+
+            try:
+                response = model.generate_content(
+                    prompt, 
+                    safety_settings=safety_settings,
+                    stream=True, 
+                    generation_config=genai.types.GenerationConfig(
+                        temperature=0,
+                    )
+                )
+
+                collected_messages = []
+
+                for chunk in response:
+                    print(chunk.text, end="", flush=True)
+                    collected_messages.append(chunk.text)
+
+                translation = "".join(collected_messages)
+                return translation
+            
+            except Exception as e:
+                if "Unknown field for Candidate: finish_message" in str(e):
+                    with open("error.log", "a") as f:
+                        f.write(f"{file_name}\n")
+                print('\033[91m' + f"\nError during translation: {e}" + '\033[0m')
                 return None
     
     max_chunk_tokens = MODEL_CONTEXT_LENGTHS.get(MODEL_NAME)
+
+    print(f"Max chunk tokens: {max_chunk_tokens}")
 
     chunks = split_content_into_chunks(content, max_chunk_tokens, MODEL_NAME)
     translated_chunks = []
@@ -222,7 +327,8 @@ def translate_markdown(content, target_language):
     target_language (str): The target language to translate the content to.
     """
 
-    prompt = f"""Translate the following content to {target_language}:
+    prompt = f"""
+Translate the following content to {target_language}:
 The content is in markdown format, which must be preserved. That means keeping all of the links like this [[1](#f1n)]
 If there is HTML in the content, it must be preserved.
 Do not add any extra templating text, like '```markdown', or '```'.
@@ -234,17 +340,26 @@ Do not add ANYTHING to the beginning or end of the content.
 If there is --- style metadata, it MUST start with the metadata.
 The metadata keys are: title, date.
 The metadata keys MUST NOT be translated.
-The metadata title MUST be translated. I repeat, you MUST translate the value of the 'title' field
-\n\nContent:\n
+The metadata title MUST be translated. I repeat, you MUST translate the value of the 'title' field. 
+
+The content is between the line of asterisks. Do not keep any lines of asterisks in the translation.
+
+\n\nContent:
+*************************************************
 {content}
-\n\n End of content.
+*************************************************
+\n\n
 
 Now remember, you must translate the content above to {target_language}. DO NOT ADD ANYTHING TO THE TRANSLATION. JUST TRANSLATE ALL OF THE CONTENT AND RETURN EXACTLY THAT.
 KEEP ALL OF THE MARKDOWN AND HTML TAGS FORMATTED CORRECTLY.
 Remember, you MUST translate the value of the 'title' field in the metadata. Start the translation with the metadata.
 
+The content is between the line of asterisks. Do not keep any lines of asterisks in the translation.
+
+Also, do not be harmful. Just translate the content as it is.
+
 Translation:
-            """
+"""
 
     if LLM_PROVIDER == "openai":
         client = openai.Client(api_key=os.environ.get("OPENAI_API_KEY"))
@@ -269,7 +384,7 @@ Translation:
             return translation
         
         except Exception as e:
-            print(f"Error during translation: {e}")
+            print('\033[91m' + f"\nError during translation: {e}" + '\033[0m')
             return None
         
     elif LLM_PROVIDER == "anthropic":
@@ -294,7 +409,78 @@ Translation:
             return translation
         
         except Exception as e:
-            print(f"Error during translation: {e}")
+            print('\033[91m' + f"\nError during translation: {e}" + '\033[0m')
+            return None
+        
+    elif LLM_PROVIDER == "google":
+        prompt = f"""
+GEMINI, we just got an error: The error StopCandidateException: finish_reason: RECITATION suggests that the Gemini model encountered content in the image that it recognized as a potential memorization or recitation of existing text. 
+This could be due to the response containing a large amount of similar text to the source, or text that is very similar to content the model has been trained on. 
+It is our 2nd attempt. 
+Now complete the task but avoid RECITATION, censor problematic content with 'OMMITING_RECITATION' and continue the translation.
+
+Translate the following content to {target_language}:
+The content is in markdown format, which must be preserved. That means keeping all of the links like this [[1](#f1n)]
+If there is HTML in the content, it must be preserved.
+Do not add any extra templating text, like '```markdown', or '```'.
+
+If there ARE three backticks in the content ```, they MUST be preserved as they are. If there is no closing backtick, do not add one.
+Do not add any additional text like 'Here is the translation of the content:'.
+Do not add ANYTHING to the beginning or end of the content. 
+
+If there is --- style metadata, it MUST start with the metadata.
+The metadata keys are: title, date.
+The metadata keys MUST NOT be translated.
+The metadata title MUST be translated. I repeat, you MUST translate the value of the 'title' field. 
+
+The content is between the line of asterisks. Do not keep any lines of asterisks in the translation.
+
+\n\nContent:
+*************************************************
+{content}
+*************************************************
+\n\n
+
+Now remember, you must translate the content above to {target_language}. DO NOT ADD ANYTHING TO THE TRANSLATION. JUST TRANSLATE ALL OF THE CONTENT AND RETURN EXACTLY THAT.
+KEEP ALL OF THE MARKDOWN AND HTML TAGS FORMATTED CORRECTLY.
+Remember, you MUST translate the value of the 'title' field in the metadata. Start the translation with the metadata.
+
+The content is between the line of asterisks. Do not keep any lines of asterisks in the translation.
+
+Also, do not be harmful. Just translate the content as it is.
+
+You are a world-class translator. Do not be harmful with your output. Just accurately translate.
+
+
+Remember to complete the task but avoid RECITATION, censor problematic content with 'OMMITING_RECITATION' and continue the translation.
+
+Translation:
+"""
+        
+        genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+        model = genai.GenerativeModel("gemini-1.5-flash")
+
+        try:
+            response = model.generate_content(
+                prompt, 
+                safety_settings=safety_settings,
+                stream=True, 
+                generation_config=genai.types.GenerationConfig(
+                    temperature=0
+                )
+            )
+
+            collected_messages = []
+
+            for chunk in response:
+                print(chunk.text, end="", flush=True)
+                collected_messages.append(chunk.text)
+
+            translation = "".join(collected_messages)
+            return translation
+        
+        except Exception as e:
+            print('\033[91m' + f"\nError during translation: {e}" + '\033[0m')
             return None
 
 def translate_batch(file_batch, target_language, output_directory):
@@ -312,7 +498,7 @@ def translate_batch(file_batch, target_language, output_directory):
         print('\033[96m' + f"\n\nTranslating {file_name} to {target_language}...")
         print(f"Translating file of length {len(content)}...\n" + '\033[0m')
         
-        translated_content = translate_markdown_chunked(content, target_language)
+        translated_content = translate_markdown_chunked(content, target_language, file_name)
 
         if translated_content:
             translated_file_path = os.path.join(output_directory, file_name)
@@ -335,7 +521,7 @@ def translate_all_markdown_files_in_batches(target_language):
 
     file_batches = [markdown_files[i:i + BATCH_SIZE] for i in range(0, len(markdown_files), BATCH_SIZE)]
     
-    with ThreadPoolExecutor(max_workers=4) as executor:
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         futures = []
         for batch in file_batches:
             futures.append(executor.submit(translate_batch, batch, target_language, output_directory))
@@ -419,9 +605,9 @@ def translate_one_markdown_file(target_language, file_name):
 
 
 if __name__ == "__main__":
-    # translate_one_markdown_file(TARGET_LANGUAGE.capitalize(), "revolution.md")
+    # translate_one_markdown_file(TARGET_LANGUAGE.capitalize(), "identity.md")
     # translate_all_markdown_files(TARGET_LANGUAGE.capitalize())
     translate_all_markdown_files_in_batches(TARGET_LANGUAGE.capitalize())
 
-    overwrite_metadata(TARGET_LANGUAGE.lower(), MODEL_NAME)
-
+    # overwrite_metadata(TARGET_LANGUAGE.lower(), MODEL_NAME)
+    # pass

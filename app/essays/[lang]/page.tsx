@@ -21,7 +21,7 @@ export default async function Page({ params }: { params: { lang: string } }) {
   const essayArray = await db
     .select()
     .from(essays)
-    .where(and(eq(essays.language, language as SupportedLanguage), eq(essays.translationModel, "gpt-4o-mini")))
+    .where(and(eq(essays.language, language as SupportedLanguage), eq(essays.translation_model, "gpt-4o-mini")))
 
   if (essayArray.length === 0) {
     return <div>There are no essays in this language</div>

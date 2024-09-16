@@ -14,7 +14,7 @@ export const essays = pgTable(
     content: text("content").notNull(),
     date_written: date("date_written").notNull(),
     language: languageEnum("language").notNull(),
-    translationModel: varchar("translation_model").default("gpt-4o-mini"),
+    translation_model: varchar("translation_model").default("gpt-4o-mini"),
     created_at: timestamp("created_at").defaultNow()
   },
   (table) => {

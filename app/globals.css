@@ -28,6 +28,11 @@ main a {
   }
 }
 
+pre code {
+  font-family: 'Fira Code', monospace;
+  white-space: pre-wrap;
+}
+
 .footnote {
   font-size: 0.8rem;
   color: #666;

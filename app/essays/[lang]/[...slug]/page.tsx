@@ -36,7 +36,7 @@ export async function generateStaticParams() {
   return essayPermutations.map((essay) => ({
     shortTitle: essay.short_title,
     lang: essay.language,
-    model: essay.translationModel
+    model: essay.translation_model
   }))
 }
 
@@ -54,7 +54,7 @@ export default async function Page({ params }: { params: { lang: string; slug: s
   const [essay] = await db
     .select()
     .from(essays)
-    .where(and(eq(essays.translationModel, model), and(eq(essays.short_title, shortTitle), eq(essays.language, language))))
+    .where(and(eq(essays.translation_model, model), and(eq(essays.short_title, shortTitle), eq(essays.language, language))))
 
   if (!essay) {
     notFound()

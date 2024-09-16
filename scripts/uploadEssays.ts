@@ -74,7 +74,7 @@ async function uploadEssays(uploadedFiles: string[], language: SupportedLanguage
         content,
         date_written: date_written,
         language: language as SupportedLanguage,
-        translationModel: language !== "english" ? model : undefined
+        translation_model: language !== "english" ? model : undefined
       })
       console.log(`${file} uploaded successfully!\n`)
     } catch (e) {
@@ -84,10 +84,10 @@ async function uploadEssays(uploadedFiles: string[], language: SupportedLanguage
 }
 
 const main = async () => {
-  const models = ["gpt-4o-mini", "claude-3-haiku-20240307"]
+  const models = ["gpt-4o-mini", "claude-3-haiku-20240307", "gemini-1.5-flash"]
   for (const language of supportedLanguages) {
     for (const model of models) {
-      if (language === "english" && model === "claude-3-haiku-20240307") {
+      if (language === "english" && model !== "gpt-4o-mini") {
         continue
       }
 
@@ -95,7 +95,7 @@ const main = async () => {
         .select()
         .from(essays)
         .where(
-          and(eq(essays.language, language as SupportedLanguage), eq(essays.translationModel, model === "claude-3-haiku-20240307" ? "claude-3-haiku" : model))
+          and(eq(essays.language, language as SupportedLanguage), eq(essays.translation_model, model === "claude-3-haiku-20240307" ? "claude-3-haiku" : model))
         )
 
       const uploadedShortTitles = uploadedEssays.map((essay) => essay.short_title)
