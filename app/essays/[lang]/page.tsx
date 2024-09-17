@@ -19,7 +19,13 @@ export default async function Page({ params }: { params: { lang: string } }) {
   }
 
   const essayArray = await db
-    .select()
+    .select({
+      id: essays.id,
+      title: essays.title,
+      short_title: essays.short_title,
+      translated_title: essays.translated_title,
+      date_written: essays.date_written
+    })
     .from(essays)
     .where(
       and(
@@ -27,6 +33,8 @@ export default async function Page({ params }: { params: { lang: string } }) {
         language === "english" ? isNull(essays.translation_model) : eq(essays.translation_model, "google-NMT")
       )
     )
+
+  console.log(essayArray)
 
   if (essayArray.length === 0) {
     return <div>There are no essays in this language</div>
