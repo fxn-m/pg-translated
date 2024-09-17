@@ -12,8 +12,11 @@ const languages = [
   { code: "english", flag: "🇬🇧", translation: "English" },
   { code: "french", flag: "🇫🇷", translation: "Français" },
   { code: "spanish", flag: "🇪🇸", translation: "Español" },
-  { code: "german", flag: "🇩🇪", translation: "Deutsch" }
-  // { code: "Request a language!", flag: "💬" }
+  { code: "portuguese", flag: "🇧🇷", translation: "Português" },
+  { code: "german", flag: "🇩🇪", translation: "Deutsch" },
+  { code: "japanese", flag: "🇯🇵", translation: "日本語" },
+  { code: "hindi", flag: "🇮🇳", translation: "हिन्दी" },
+  { code: "chinese", flag: "🇨🇳", translation: "中文" }
 ]
 
 export default function LanguageSelector() {

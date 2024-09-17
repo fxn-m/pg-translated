@@ -1,5 +1,5 @@
 import { db } from "@/db"
-import { eq, and } from "drizzle-orm"
+import { eq, and, isNull } from "drizzle-orm"
 import { essays } from "@/db/schema"
 import { type SupportedLanguage, supportedLanguages } from "@/db/schema"
 import Link from "next/link"
@@ -21,7 +21,12 @@ export default async function Page({ params }: { params: { lang: string } }) {
   const essayArray = await db
     .select()
     .from(essays)
-    .where(and(eq(essays.language, language as SupportedLanguage), eq(essays.translation_model, "gpt-4o-mini")))
+    .where(
+      and(
+        eq(essays.language, language as SupportedLanguage),
+        language === "english" ? isNull(essays.translation_model) : eq(essays.translation_model, "google-NMT")
+      )
+    )
 
   if (essayArray.length === 0) {
     return <div>There are no essays in this language</div>
@@ -47,7 +52,7 @@ export default async function Page({ params }: { params: { lang: string } }) {
         {years.map((year) => (
           <div key={year}>
             {year != "1969" && (
-              <h2 className="sm:text-md mb-2 mt-4 border-b border-b-slate-200 pb-1 text-sm font-bold text-stone-600 dark:border-b-slate-600 dark:text-stone-400">
+              <h2 className="sm:text-md min-w-md mb-2 mt-4 max-w-xl border-b border-b-slate-200 pb-1 text-sm font-bold text-stone-600 dark:border-b-slate-600 dark:text-stone-400">
                 {year}
               </h2>
             )}

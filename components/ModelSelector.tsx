@@ -6,7 +6,7 @@ import { ChevronDown } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
-const models = ["gpt-4o-mini", "claude-3-haiku", "gemini-1.5-flash"]
+const models = ["google-NMT", "gpt-4o-mini", "gemini-1.5-flash", "claude-3-haiku"]
 
 export default function ModelSelector() {
   const [isOpen, setIsOpen] = useState(false)
@@ -43,7 +43,7 @@ export default function ModelSelector() {
           aria-haspopup="true"
           onClick={() => setIsOpen(!isOpen)}
         >
-          {model || "gpt-4o-mini"}
+          {model || "google-NMT"}
           <ChevronDown className={`-mr-1 h-5 w-5 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""} dark:text-gray-300`} aria-hidden="true" />
         </button>
       </div>

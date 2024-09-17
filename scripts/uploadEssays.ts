@@ -8,14 +8,23 @@ import path from "path"
 import yaml from "js-yaml"
 
 const fileName = "" // * if uploading a specific file for testing
+const models = ["google-NMT", "gpt-4o-mini", "gemini-1.5-flash", "claude-3-haiku"]
 
-async function uploadEssays(uploadedFiles: string[], language: SupportedLanguage, model: string) {
-  const essayDirectory = path.join(__dirname, "../python/essaysMD" + language + `${language !== "english" ? "-" + model : ""}`)
-  const files = readdirSync(essayDirectory)
+const modelMap = {
+  "google-NMT": "google-NMT",
+  "gpt-4o-mini": "gpt-4o-mini",
+  "gemini-1.5-flash": "gemini-1.5-flash",
+  "claude-3-haiku": "claude-3-haiku-20240307"
+}
 
-  if (model === "claude-3-haiku-20240307") {
-    model = "claude-3-haiku"
+async function uploadEssays(uploadedFiles: string[], language: SupportedLanguage, model?: keyof typeof modelMap) {
+  let essayDirectory: string
+  if (!model) {
+    essayDirectory = path.join(__dirname, "../python/essaysMDenglish")
+  } else {
+    essayDirectory = path.join(__dirname, "../python/essaysMD" + language + "-" + modelMap[model])
   }
+  const files = readdirSync(essayDirectory)
 
   for (const file of files) {
     if (fileName && file !== fileName) {
@@ -84,25 +93,28 @@ async function uploadEssays(uploadedFiles: string[], language: SupportedLanguage
 }
 
 const main = async () => {
-  const models = ["gpt-4o-mini", "claude-3-haiku-20240307", "gemini-1.5-flash"]
+  // Upload non-English essays
   for (const language of supportedLanguages) {
     for (const model of models) {
-      if (language === "english" && model !== "gpt-4o-mini") {
+      if (language === "english") {
         continue
       }
 
       const uploadedEssays = await db
         .select()
         .from(essays)
-        .where(
-          and(eq(essays.language, language as SupportedLanguage), eq(essays.translation_model, model === "claude-3-haiku-20240307" ? "claude-3-haiku" : model))
-        )
+        .where(and(eq(essays.language, language as SupportedLanguage), eq(essays.translation_model, model as keyof typeof modelMap)))
 
       const uploadedShortTitles = uploadedEssays.map((essay) => essay.short_title)
 
-      await uploadEssays(uploadedShortTitles, language, model)
+      await uploadEssays(uploadedShortTitles, language, model as keyof typeof modelMap)
     }
   }
+
+  // Upload English essays
+  const uploadedEssays = await db.select().from(essays).where(eq(essays.language, "english"))
+  const uploadedShortTitles = uploadedEssays.map((essay) => essay.short_title)
+  await uploadEssays(uploadedShortTitles, "english")
 
   process.exit(0)
 }

@@ -1,6 +1,6 @@
 import { date, index, integer, pgEnum, pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core"
 
-export const languageEnum = pgEnum("language_enum", ["english", "french", "spanish", "german"])
+export const languageEnum = pgEnum("language_enum", ["english", "french", "spanish", "german", "japanese", "hindi", "chinese", "portuguese"])
 export const supportedLanguages = languageEnum.enumValues
 export type SupportedLanguage = (typeof supportedLanguages)[number] // ! BAD: This is a hack to get the type of the enum values
 
@@ -14,7 +14,7 @@ export const essays = pgTable(
     content: text("content").notNull(),
     date_written: date("date_written").notNull(),
     language: languageEnum("language").notNull(),
-    translation_model: varchar("translation_model").default("gpt-4o-mini"),
+    translation_model: varchar("translation_model"),
     created_at: timestamp("created_at").defaultNow()
   },
   (table) => {

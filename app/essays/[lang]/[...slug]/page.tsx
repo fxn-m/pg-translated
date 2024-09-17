@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm"
+import { isNull, eq, and } from "drizzle-orm"
 
 import { db } from "@/db"
 import { essays } from "@/db/schema"
@@ -42,7 +42,7 @@ export async function generateStaticParams() {
 
 export default async function Page({ params }: { params: { lang: string; slug: string[] } }) {
   const { lang, slug } = params
-  const [rawShortTitle, model = "gpt-4o-mini"] = slug
+  const [rawShortTitle, model = "google-NMT"] = slug
 
   const language = lang.toLowerCase() as SupportedLanguage // ! BAD: This is a hack to get the type of the enum values
 
@@ -51,11 +51,17 @@ export default async function Page({ params }: { params: { lang: string; slug: s
   }
 
   const shortTitle = rawShortTitle.replace(/%20/g, " ")
+
   const [essay] = await db
     .select()
     .from(essays)
-    .where(and(eq(essays.translation_model, model), and(eq(essays.short_title, shortTitle), eq(essays.language, language))))
-
+    .where(
+      and(
+        language === "english" ? isNull(essays.translation_model) : eq(essays.translation_model, model),
+        eq(essays.short_title, shortTitle),
+        eq(essays.language, language)
+      )
+    )
   if (!essay) {
     notFound()
   }

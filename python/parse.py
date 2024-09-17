@@ -1,6 +1,10 @@
 import os
 import re
 from bs4 import BeautifulSoup
+import markdownify
+import markdown
+import html2text
+import pypandoc
 
 def convert_html_to_markdown(html_content: str) -> str:
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -82,10 +86,102 @@ def convert_and_save(html_file_path, md_file_path):
         with open(md_file_path, 'w') as file:
             file.write(markdown)
 
-TEST_FILE = None
+def parse_html(html_file_path=None, html_content=None):
+    if html_file_path:
+        html_content = pypandoc.convert_file(html_file_path, 'html')
+    if html_content:
+        md = pypandoc.convert_text(
+            html_content,
+            to='markdown_strict+backtick_code_blocks',
+            format='html',
+            extra_args=['--wrap=preserve', '--markdown-headings=atx']
+        )
+        return md
+    else:
+        return None
 
-if TEST_FILE:
-    convert_and_save(f'essaysHTML/{TEST_FILE}', f'essaysMDenglish/{TEST_FILE.replace(".html", ".md")}')
-else:
-    for htmlFile in os.listdir('essaysHTML'):
-        convert_and_save(f'essaysHTML/{htmlFile}', f'essaysMDenglish/{htmlFile.replace(".html", ".md")}')
+def parse_markdown(md_file_path):
+    import re
+    import pypandoc
+    from bs4 import BeautifulSoup, NavigableString, Tag
+
+    with open(md_file_path, 'r', encoding='utf-8') as file:
+        content = file.read()
+
+    # Extract the title from the Markdown content
+    title_match = re.search(r'^title:\s*(.*)', content, re.MULTILINE)
+    if title_match:
+        title = title_match.group(1)
+    else:
+        title = ''
+
+    # Convert Markdown to HTML using Pandoc
+    html = pypandoc.convert_text(
+        content,
+        to='html',
+        format='markdown_strict+yaml_metadata_block+backtick_code_blocks',
+        extra_args=['--wrap=preserve']
+    )
+
+    # Parse the HTML with BeautifulSoup
+    soup = BeautifulSoup(html, 'html.parser')
+
+    # Process <pre><code> blocks to insert <br /> on empty lines
+    for pre in soup.find_all('pre'):
+        code = pre.find('code')
+        if code and code.string:
+            # Capture the original code content
+            original_code = code.string
+            # Clear the code block contents
+            code.clear()
+            # Split the original code content into lines
+            code_lines = original_code.split('\n')
+            for idx, line in enumerate(code_lines):
+                # For each line, add it as NavigableString
+                code.append(NavigableString(line))
+                # If it's not the last line, add a newline
+                if idx < len(code_lines) - 1:
+                    code.append('\n')
+                # If the line is empty, insert two <br /> tags
+                if line.strip() == '':
+                    for _ in range(2):
+                        br_tag = soup.new_tag('br')
+                        code.append(br_tag)
+
+
+
+    # Prepend the title if it exists
+    if title:
+        h1_tag = soup.new_tag('h1')
+        h1_tag.string = title
+        soup.insert(0, h1_tag)
+
+    # Get the modified HTML as a string
+    modified_html = str(soup)
+
+    return modified_html
+
+def parse_all_markdown_to_english_html():
+    if not os.path.exists('essaysHTMLenglish'):
+        os.makedirs('essaysHTMLenglish')
+    for mdFile in os.listdir('essaysMDenglish'):
+        if os.path.exists(f'essaysHTMLenglish/{mdFile.replace(".md", ".html")}'):
+            print(f'Skipping {mdFile} as it already exists')
+            continue
+        html = parse_markdown(f'essaysMDenglish/{mdFile}')
+        with open(f'essaysHTMLenglish/{mdFile.replace(".md", ".html")}', 'w') as file:
+            file.write(html)
+
+def parse_all_html_to_markdown(target_language):
+    for htmlFile in os.listdir(f'essaysHTML{target_language}-cloud_translation'):
+        if os.path.exists(f'essaysMD{target_language}-google-NMT/{htmlFile.replace(".html", ".md")}'):
+            print(f'Skipping {htmlFile} as it already exists')
+            continue
+        md = parse_html(f'essaysHTML{target_language}-cloud_translation/{htmlFile}')
+        if not os.path.exists(f'essaysMD{target_language}-google-NMT'):
+            os.makedirs(f'essaysMD{target_language}-google-NMT')
+        with open(f'essaysMD{target_language}-google-NMT/{htmlFile.replace(".html", ".md")}', 'w') as file:
+            file.write(md)
+
+if __name__ == '__main__':
+    target_language = 'french'

@@ -9,7 +9,11 @@ const languageData: Record<string, { translation: string; flag: string; name: st
   english: { name: "English", code: "EN", translation: "essays", flag: "🇬🇧" },
   french: { name: "Français", code: "FR", translation: "essais", flag: "🇫🇷" },
   spanish: { name: "Español", code: "ES", translation: "ensayos", flag: "🇪🇸" },
-  german: { name: "Deutsch", code: "DE", translation: "aufsätze", flag: "🇩🇪" }
+  portuguese: { name: "Português", code: "PT-BR", translation: "ensaios", flag: "🇧🇷" },
+  german: { name: "Deutsch", code: "DE", translation: "aufsätze", flag: "🇩🇪" },
+  japanese: { name: "日本語", code: "JP", translation: "エッセイ", flag: "🇯🇵" },
+  hindi: { name: "हिन्दी", code: "HI", translation: "निबंध", flag: "🇮🇳" },
+  chinese: { name: "中文", code: "ZH", translation: "论文", flag: "🇨🇳" }
 }
 
 const LanguageIndicator = ({ language }: { language: keyof typeof languageData }) => (

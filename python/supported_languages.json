@@ -2,6 +2,12 @@
     "supported_languages": [
         "french",
         "spanish",
-        "german"
+        "german",
+        "portuguese",
+        "hindi",
+        "japanese",
+        "korean",
+        "chinese",
+        "arabic"
     ]
 }

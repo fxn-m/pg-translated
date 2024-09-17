@@ -78,6 +78,20 @@
       "when": 1726420128444,
       "tag": "0010_sad_malice",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1726491576814,
+      "tag": "0011_chief_mentallo",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1726588933616,
+      "tag": "0012_white_bucky",
+      "breakpoints": true
     }
   ]
 }
