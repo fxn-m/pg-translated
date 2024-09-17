@@ -5,12 +5,21 @@ import { Suspense } from "react"
 import { Typewriter } from "react-simple-typewriter"
 import { useSearchParams } from "next/navigation"
 
-const languageData: Record<string, { translation: string; flag: string; name: string; code: string }> = {
-  english: { name: "English", code: "EN", translation: "essays", flag: "🇬🇧" },
-  french: { name: "Français", code: "FR", translation: "essais", flag: "🇫🇷" },
-  spanish: { name: "Español", code: "ES", translation: "ensayos", flag: "🇪🇸" },
-  portuguese: { name: "Português", code: "PT-BR", translation: "ensaios", flag: "🇧🇷" },
-  german: { name: "Deutsch", code: "DE", translation: "aufsätze", flag: "🇩🇪" },
+type LanguageData = {
+  [key: string]: {
+    translation: string
+    flag: string
+    name: string
+    code: string
+  }
+}
+
+const languageData: LanguageData = {
+  english: { name: "English", code: "EN", translation: "Essays", flag: "🇬🇧" },
+  french: { name: "Français", code: "FR", translation: "Essais", flag: "🇫🇷" },
+  spanish: { name: "Español", code: "ES", translation: "Ensayos", flag: "🇪🇸" },
+  portuguese: { name: "Português", code: "PT-BR", translation: "Ensaios", flag: "🇧🇷" },
+  german: { name: "Deutsch", code: "DE", translation: "Aufsätze", flag: "🇩🇪" },
   japanese: { name: "日本語", code: "JP", translation: "エッセイ", flag: "🇯🇵" },
   hindi: { name: "हिन्दी", code: "HI", translation: "निबंध", flag: "🇮🇳" },
   chinese: { name: "中文", code: "ZH", translation: "论文", flag: "🇨🇳" }
