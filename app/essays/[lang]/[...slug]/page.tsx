@@ -31,7 +31,13 @@ function ExternalLinkComponent({ short_title }: { short_title: string }) {
 
 // Return a list of `params` to populate the [slug] dynamic segment
 export async function generateStaticParams() {
-  const essayPermutations = await db.select().from(essays)
+  const essayPermutations = await db
+    .select({
+      short_title: essays.short_title,
+      language: essays.language,
+      translation_model: essays.translation_model
+    })
+    .from(essays)
 
   return essayPermutations.map((essay) => ({
     shortTitle: essay.short_title,
@@ -53,7 +59,12 @@ export default async function Page({ params }: { params: { lang: string; slug: s
   const shortTitle = rawShortTitle.replace(/%20/g, " ")
 
   const [essay] = await db
-    .select()
+    .select({
+      id: essays.id,
+      short_title: essays.short_title,
+      translated_title: essays.translated_title,
+      content: essays.content
+    })
     .from(essays)
     .where(
       and(

@@ -101,7 +101,7 @@ const main = async () => {
       }
 
       const uploadedEssays = await db
-        .select()
+        .select({ short_title: essays.short_title })
         .from(essays)
         .where(and(eq(essays.language, language as SupportedLanguage), eq(essays.translation_model, model as keyof typeof modelMap)))
 
@@ -112,7 +112,7 @@ const main = async () => {
   }
 
   // Upload English essays
-  const uploadedEssays = await db.select().from(essays).where(eq(essays.language, "english"))
+  const uploadedEssays = await db.select({ short_title: essays.short_title }).from(essays).where(eq(essays.language, "english"))
   const uploadedShortTitles = uploadedEssays.map((essay) => essay.short_title)
   await uploadEssays(uploadedShortTitles, "english")
 
