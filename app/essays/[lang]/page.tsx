@@ -34,8 +34,6 @@ export default async function Page({ params }: { params: { lang: string } }) {
       )
     )
 
-  console.log(essayArray)
-
   if (essayArray.length === 0) {
     return <div>There are no essays in this language</div>
   }
@@ -56,7 +54,7 @@ export default async function Page({ params }: { params: { lang: string } }) {
 
   return (
     <div className="flex flex-grow flex-col pb-8">
-      <main className={`flex flex-col space-y-${language === "english" ? "1" : "4"}`}>
+      <main className={`flex flex-col`}>
         {years.map((year) => (
           <div key={year}>
             {year != "1969" && (
@@ -64,14 +62,14 @@ export default async function Page({ params }: { params: { lang: string } }) {
                 {year}
               </h2>
             )}
-            <div className="flex flex-col space-y-2">
+            <div className={`flex flex-col space-y-${language === "english" ? "1" : "2"}`}>
               {essaysByYear[year]
                 .sort((a, b) => new Date(b.date_written).getTime() - new Date(a.date_written).getTime())
                 .map((essay) => (
-                  <div key={essay.id} className="flex flex-col">
-                    <p>
+                  <div key={essay.id} className={`flex flex-col`}>
+                    <p className={`text-md`}>
                       <Link
-                        className={`text-md text-blue-600 visited:text-gray-400 hover:underline sm:${language === "english" ? "text-md" : "text-lg"} dark:text-blue-500`}
+                        className={`text-blue-600 visited:text-gray-400 hover:underline dark:text-blue-500`}
                         href={`/essays/${language}/${essay.short_title}`}
                       >
                         {essay.translated_title}

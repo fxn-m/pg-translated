@@ -35,7 +35,7 @@ const LanguageIndicator = ({ language }: { language: keyof typeof languageData }
 )
 
 const languages = Object.keys(languageData)
-const translations = [...languages.map((lang) => languageData[lang].translation), "essays - translated"]
+const translations = [...languages.map((lang) => languageData[lang].translation), "Essays - Translated"]
 
 export default function Home() {
   const searchParams = useSearchParams()
