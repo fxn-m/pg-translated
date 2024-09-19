@@ -146,6 +146,17 @@ def count_all_tokens():
 
     print("\nTotal tokens in all files:", total_tokens)
 
+def count_all_characters():
+    total_characters = 0
+
+    for filename in os.listdir('./essaysMDenglish'):
+        if filename.endswith(".md"):
+            with open(f'./essaysMDenglish/{filename}', 'r') as file:
+                content = file.read()
+            total_characters += len(content)
+
+    print("\nTotal characters in all files:", total_characters)
+
 def shortest_100_essays():
     total_words = 0
     essayWordsMap = {}
@@ -417,3 +428,6 @@ if __name__ == "__main__":
 
         elif sys.argv[1] == "tokens":
             count_all_tokens()
+
+        elif sys.argv[1] == "characters":
+            count_all_characters()

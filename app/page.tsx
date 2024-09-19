@@ -48,7 +48,7 @@ export default function Home() {
         <Suspense>
           <div className="flex flex-grow flex-col items-center justify-center">
             <h1 className="mb-4 flex flex-wrap items-center justify-center font-mono text-2xl font-bold">
-              <span>Paul Graham&apos;s&nbsp;</span>
+              Paul Graham&apos;s&nbsp;
               <span className="relative font-mono text-blue-600">
                 {isValidLanguage ? (
                   <Link className="hover:underline" href={`/essays/${language}`}>

@@ -36,7 +36,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Paul Graham's Essays - Translated",
-  description: "A collection of Paul Graham's essays, translated into multiple languages."
+  description: "All of Paul Graham's essays, translated into multiple languages.",
+  verification: { google: "Jyvg74NWOsKSbfvRJSDfH08HfQp" }
 }
 
 export default function RootLayout({

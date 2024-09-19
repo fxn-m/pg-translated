@@ -84,7 +84,7 @@ export default function LanguageSelector() {
               >
                 {isWindows ? (
                   <div className="flex flex-row items-center">
-                    <Image src={`./flagIcons/${language.code}.svg`} alt="flagIcon" width={16} height={16} /> &nbsp; {language.translation}
+                    <Image src={`/flagIcons/${language.code}.svg`} alt="flagIcon" width={16} height={16} /> &nbsp; {language.translation}
                   </div>
                 ) : (
                   <div>
