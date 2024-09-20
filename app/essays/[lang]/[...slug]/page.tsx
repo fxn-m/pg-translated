@@ -4,16 +4,27 @@ import { ArrowUpRight } from "lucide-react"
 import Error from "@/app/error"
 import Feedback from "./Feedback"
 import Link from "next/link"
+import { capitalise } from "@/lib/utils"
 import { db } from "@/db"
 import { essays } from "@/db/schema"
 import gfm from "remark-gfm"
 import { isSupportedLanguage } from "@/db/schema"
+import { languageData } from "@/lib/languageData"
 import { notFound } from "next/navigation"
 import rehypeRaw from "rehype-raw"
 import rehypeStringify from "rehype-stringify"
 import { remark } from "remark"
 import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
+
+export async function generateMetadata({ params }: { params: { lang: string; slug: string[] } }) {
+  const [rawShortTitle, model = "google-NMT"] = params.slug
+  const languageName = capitalise(languageData[params.lang].name)
+  return {
+    title: `${capitalise(rawShortTitle)} - ${languageName} - ${capitalise(model)}`,
+    description: `Paul Graham's ${capitalise(rawShortTitle)} in ${languageName} using ${capitalise(model)}`
+  }
+}
 
 function ExternalLinkComponent({ short_title }: { short_title: string }) {
   return (

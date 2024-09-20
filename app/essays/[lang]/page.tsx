@@ -4,6 +4,17 @@ import { essays } from "@/db/schema"
 import { type SupportedLanguage, supportedLanguages } from "@/db/schema"
 import Link from "next/link"
 import Error from "@/app/error"
+import { capitalise } from "@/lib/utils"
+import { languageData } from "@/lib/languageData"
+
+export async function generateMetadata({ params }: { params: { lang: string } }) {
+  const languageName = capitalise(languageData[params.lang].name)
+  const essaysTranslation = languageData[params.lang].translation
+  return {
+    title: `Paul Graham's ${capitalise(essaysTranslation)} - ${languageName}`,
+    description: `A collection of Paul Graham's ${essaysTranslation} in ${languageName}`
+  }
+}
 
 // Return a list of `params` to populate the [slug] dynamic segment
 export const generateStaticParams = async () =>
