@@ -1,8 +1,19 @@
 import { date, index, integer, pgEnum, pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core"
 
-export const languageEnum = pgEnum("language_enum", ["english", "french", "spanish", "german", "japanese", "hindi", "chinese", "portuguese"])
-export const supportedLanguages = languageEnum.enumValues
-export type SupportedLanguage = (typeof supportedLanguages)[number] // ! BAD: This is a hack to get the type of the enum values
+export const supportedLanguages = ["english", "french", "spanish", "german", "portuguese", "japanese", "hindi", "chinese"] as const
+export type SupportedLanguage = (typeof supportedLanguages)[number]
+export const isSupportedLanguage = (lang: string): lang is SupportedLanguage => supportedLanguages.some((supportedLang) => supportedLang === lang)
+const languageEnum = pgEnum("language_enum", supportedLanguages)
+export const languageCodes: Record<SupportedLanguage, string> = {
+  english: "en",
+  french: "fr",
+  spanish: "es",
+  german: "de",
+  portuguese: "pt",
+  japanese: "ja",
+  hindi: "hi",
+  chinese: "zh"
+}
 
 export const essays = pgTable(
   "essays",

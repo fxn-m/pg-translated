@@ -6,7 +6,7 @@ import { ChevronDown } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
-const models = ["google-NMT", "gpt-4o-mini", "gemini-1.5-flash", "claude-3-haiku"]
+export const models = ["google-NMT", "gpt-4o-mini", "gemini-1.5-flash", "claude-3-haiku"]
 
 export default function ModelSelector() {
   const [isOpen, setIsOpen] = useState(false)

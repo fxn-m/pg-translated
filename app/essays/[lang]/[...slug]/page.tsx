@@ -1,19 +1,19 @@
-import { isNull, eq, and } from "drizzle-orm"
+import { and, eq, isNull } from "drizzle-orm"
 
+import { ArrowUpRight } from "lucide-react"
+import Error from "@/app/error"
+import Feedback from "./Feedback"
+import Link from "next/link"
 import { db } from "@/db"
 import { essays } from "@/db/schema"
 import gfm from "remark-gfm"
+import { isSupportedLanguage } from "@/db/schema"
+import { notFound } from "next/navigation"
 import rehypeRaw from "rehype-raw"
 import rehypeStringify from "rehype-stringify"
 import { remark } from "remark"
 import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
-import { type SupportedLanguage, supportedLanguages } from "@/db/schema"
-import Link from "next/link"
-import { ArrowUpRight } from "lucide-react"
-import { notFound } from "next/navigation"
-import Error from "@/app/error"
-import Feedback from "./Feedback"
 
 function ExternalLinkComponent({ short_title }: { short_title: string }) {
   return (
@@ -50,9 +50,9 @@ export default async function Page({ params }: { params: { lang: string; slug: s
   const { lang, slug } = params
   const [rawShortTitle, model = "google-NMT"] = slug
 
-  const language = lang.toLowerCase() as SupportedLanguage // ! BAD: This is a hack to get the type of the enum values
+  const language = lang.toLowerCase()
 
-  if (!supportedLanguages.includes(language)) {
+  if (!isSupportedLanguage(language)) {
     return <Error message="Invalid language" reset={() => {}} />
   }
 
