@@ -22,7 +22,7 @@ export default function NotFound() {
         <p className="">This essay hasn&apos;t been written yet, not even by Paul Graham.</p>
       </div>
 
-      <div className="flex flex-row justify-center gap-x-4">
+      <div className="flex flex-col justify-center gap-2 sm:flex-row sm:gap-x-4">
         <Button variant="secondary">
           <Link href="/" className="inline-flex items-center">
             <Home className="mr-2" size={16} />
