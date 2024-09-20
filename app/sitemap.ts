@@ -39,7 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     supportedLanguages.forEach((language) => {
       sitemapEntries.push({
-        url: `https://paulgraham-translated.vercel.app/?lang=${language}`,
+        url: `https://paulgraham-translated.vercel.app?lang=${language}`,
         lastModified: new Date(),
         changeFrequency: "monthly",
         priority: 0.9,
