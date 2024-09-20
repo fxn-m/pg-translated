@@ -37,12 +37,16 @@ export async function generateMetadata({ params }: { params: { lang: string; slu
     `${essayTitle} - ${languageName}`,
     `${essayTitle} - ${languageName} - ${modelName}`,
     `Paul Graham's ${essayTitle}`,
-    `Paul Graham Essays - ${languageName} `,
+    `Paul Graham Essays - ${languageName}`,
     `Paul Graham's ${essayTitle} Translation`,
     `Translated ${essayTitle} by Paul Graham`,
     `${languageName} Translation of ${essayTitle}`,
     `Paul Graham's Essays in ${languageName}`,
-    `AI Translation - ${essayTitle} by Paul Graham`
+    `AI Translation - ${essayTitle} by Paul Graham`,
+    `Read ${essayTitle} by Paul Graham in ${languageName}`,
+    `Understand Paul Graham's ${essayTitle} in ${languageName}`,
+    `Learn from ${essayTitle} by Paul Graham - Translated into ${languageName}`,
+    `Paul Graham's Essays on ${essayTitle} in ${languageName}`
   ]
 
   return {

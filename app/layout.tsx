@@ -39,6 +39,13 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Paul Graham's Essays - Translated",
   description: "All of Paul Graham's essays, translated into multiple languages.",
+  creator: "fxn-m",
+  openGraph: {
+    title: "Paul Graham's Essays - Translated",
+    description: "All of Paul Graham's essays, translated into multiple languages.",
+    type: "website",
+    locale: "en"
+  },
   verification: { google: "Jyvg74NWOsKSbfvRJSDfH08HfQp-34IgOoL4823oQFM" },
   alternates: {
     canonical: "https://paulgraham-translated.vercel.app/",
@@ -52,7 +59,16 @@ export const metadata: Metadata = {
       return acc
     }, {})
   },
-  keywords: ["Paul Graham Essays Translation", "Paul Graham Essays Translated", "Paul Graham Essays in Multiple Languages"]
+  keywords: [
+    "Paul Graham Essays Translation",
+    "Paul Graham Essays Translated",
+    "Paul Graham Essays in Multiple Languages",
+    "Read Paul Graham Essays Translated",
+    "Paul Graham Essay Collection Translated",
+    "Translate Paul Graham Essays",
+    "Access Paul Graham Essays in Multiple Languages",
+    "Essays Translated into Multiple Languages"
+  ]
 }
 
 export default function RootLayout({

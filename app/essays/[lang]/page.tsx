@@ -22,7 +22,11 @@ export async function generateMetadata({ params }: { params: { lang: string } })
     `Paul Graham's ${essaysTranslation} in ${languageName}`,
     `Paul Graham's ${essaysTranslation} - ${languageName}`,
     `Paul Graham's Essays - ${languageName}`,
-    `Paul Graham Essays - ${languageName} `
+    `Paul Graham Essays - ${languageName}`,
+    `Read Paul Graham's ${essaysTranslation} in ${languageName}`,
+    `Paul Graham's ${languageName} Essay Translations`,
+    `Multilingual Paul Graham Essays - ${languageName}`,
+    `Access Paul Graham's Essays in ${languageName}`
   ]
 
   return {
