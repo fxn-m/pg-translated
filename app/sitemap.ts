@@ -4,7 +4,7 @@ import { MetadataRoute } from "next"
 import { db } from "@/db"
 import { eq } from "drizzle-orm"
 import { essays } from "@/db/schema"
-import { models } from "@/components/ModelSelector"
+import { models } from "@/db/schema"
 
 function generateAlternates(basePath: string) {
   const alternates = {

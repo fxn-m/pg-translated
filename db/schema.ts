@@ -15,6 +15,8 @@ export const languageCodes: Record<SupportedLanguage, string> = {
   chinese: "zh"
 }
 
+export const models = ["google-NMT", "gpt-4o-mini", "gemini-1.5-flash", "claude-3-haiku"]
+
 export const essays = pgTable(
   "essays",
   {
