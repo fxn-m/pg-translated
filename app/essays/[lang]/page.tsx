@@ -1,6 +1,6 @@
 import { db } from "@/db"
 import { eq, and, isNull } from "drizzle-orm"
-import { essays } from "@/db/schema"
+import { essays, isSupportedLanguage } from "@/db/schema"
 import { type SupportedLanguage, supportedLanguages } from "@/db/schema"
 import Link from "next/link"
 import Error from "@/app/error"
@@ -8,6 +8,12 @@ import { capitalise } from "@/lib/utils"
 import { languageData } from "@/lib/languageData"
 
 export async function generateMetadata({ params }: { params: { lang: string } }) {
+  if (!isSupportedLanguage(params.lang)) {
+    return {
+      title: "500 - Invalid Language",
+      description: "The language you have selected is not supported"
+    }
+  }
   const languageName = capitalise(languageData[params.lang].name)
   const essaysTranslation = languageData[params.lang].translation
   return {
@@ -25,7 +31,7 @@ export const generateStaticParams = async () =>
 export default async function Page({ params }: { params: { lang: string } }) {
   const language = params.lang
 
-  if (!supportedLanguages.includes(language as SupportedLanguage)) {
+  if (!isSupportedLanguage(language)) {
     return <Error message="Invalid language" />
   }
 

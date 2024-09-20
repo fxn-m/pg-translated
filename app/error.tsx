@@ -28,10 +28,12 @@ export default function Error({ message, reset }: ErrorProps) {
             Home
           </Link>
         </Button>
+
         <Button variant="ghost" onClick={router.back}>
           <Undo2 className="mr-2" size={16} />
           Go Back
         </Button>
+
         {reset && (
           <Button variant="ghost" onClick={reset}>
             <RefreshCcw className="mr-2" size={16} />

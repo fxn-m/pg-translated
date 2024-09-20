@@ -19,7 +19,16 @@ import remarkRehype from "remark-rehype"
 
 export async function generateMetadata({ params }: { params: { lang: string; slug: string[] } }) {
   const [rawShortTitle, model = "google-NMT"] = params.slug
+
+  if (!isSupportedLanguage(params.lang)) {
+    return {
+      title: "500 - Invalid Language",
+      description: "The language you have selected is not supported"
+    }
+  }
+
   const languageName = capitalise(languageData[params.lang].name)
+
   return {
     title: `${capitalise(rawShortTitle)} - ${languageName} - ${capitalise(model)}`,
     description: `Paul Graham's ${capitalise(rawShortTitle)} in ${languageName} using ${capitalise(model)}`
@@ -64,7 +73,7 @@ export default async function Page({ params }: { params: { lang: string; slug: s
   const language = lang.toLowerCase()
 
   if (!isSupportedLanguage(language)) {
-    return <Error message="Invalid language" reset={() => {}} />
+    return <Error message="Invalid language" />
   }
 
   const shortTitle = rawShortTitle.replace(/%20/g, " ")
