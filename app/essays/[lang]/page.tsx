@@ -6,23 +6,32 @@ import Link from "next/link"
 import Error from "@/app/error"
 import { capitalise } from "@/lib/utils"
 import { languageData } from "@/lib/languageData"
+import { Metadata } from "next"
 
-export async function generateMetadata({ params }: { params: { lang: string } }) {
+export async function generateMetadata({ params }: { params: { lang: string } }): Promise<Metadata> {
   if (!isSupportedLanguage(params.lang)) {
     return {
       title: "500 - Invalid Language",
       description: "The language you have selected is not supported"
     }
   }
+
   const languageName = capitalise(languageData[params.lang].name)
   const essaysTranslation = languageData[params.lang].translation
+  const keywords = [
+    `Paul Graham's ${essaysTranslation} in ${languageName}`,
+    `Paul Graham's ${essaysTranslation} - ${languageName}`,
+    `Paul Graham's Essays - ${languageName}`,
+    `Paul Graham Essays - ${languageName} `
+  ]
+
   return {
     title: `Paul Graham's ${capitalise(essaysTranslation)} - ${languageName}`,
-    description: `A collection of Paul Graham's ${essaysTranslation} in ${languageName}`
+    description: `Paul Graham's ${essaysTranslation} in ${languageName}`,
+    keywords
   }
 }
 
-// Return a list of `params` to populate the [slug] dynamic segment
 export const generateStaticParams = async () =>
   supportedLanguages.map((language) => ({
     language

@@ -37,7 +37,8 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Paul Graham's Essays - Translated",
   description: "All of Paul Graham's essays, translated into multiple languages.",
-  verification: { google: "Jyvg74NWOsKSbfvRJSDfH08HfQp-34IgOoL4823oQFM" }
+  verification: { google: "Jyvg74NWOsKSbfvRJSDfH08HfQp-34IgOoL4823oQFM" },
+  keywords: ["Paul Graham Essays Translation", "Paul Graham Essays Translated", "Paul Graham Essays in Multiple Languages"]
 }
 
 export default function RootLayout({
@@ -46,7 +47,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html>
+    <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${verdana.variable} ${inter.variable} flex h-dvh flex-col p-4 antialiased sm:h-screen sm:p-8`}
       >

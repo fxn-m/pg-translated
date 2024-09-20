@@ -1,12 +1,13 @@
 import { and, eq, isNull } from "drizzle-orm"
+import { essays, languageCodes, supportedLanguages } from "@/db/schema"
 
 import { ArrowUpRight } from "lucide-react"
 import Error from "@/app/error"
 import Feedback from "./Feedback"
 import Link from "next/link"
+import { Metadata } from "next"
 import { capitalise } from "@/lib/utils"
 import { db } from "@/db"
-import { essays } from "@/db/schema"
 import gfm from "remark-gfm"
 import { isSupportedLanguage } from "@/db/schema"
 import { languageData } from "@/lib/languageData"
@@ -17,7 +18,7 @@ import { remark } from "remark"
 import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
 
-export async function generateMetadata({ params }: { params: { lang: string; slug: string[] } }) {
+export async function generateMetadata({ params }: { params: { lang: string; slug: string[] } }): Promise<Metadata> {
   const [rawShortTitle, model = "google-NMT"] = params.slug
 
   if (!isSupportedLanguage(params.lang)) {
@@ -28,10 +29,40 @@ export async function generateMetadata({ params }: { params: { lang: string; slu
   }
 
   const languageName = capitalise(languageData[params.lang].name)
+  const essayTitle = capitalise(rawShortTitle)
+  const modelName = capitalise(model.replace("-", " "))
+
+  const keywords = [
+    `${essayTitle} in ${languageName}`,
+    `${essayTitle} - ${languageName}`,
+    `${essayTitle} - ${languageName} - ${modelName}`,
+    `Paul Graham's ${essayTitle}`,
+    `Paul Graham Essays - ${languageName} `,
+    `Paul Graham's ${essayTitle} Translation`,
+    `Translated ${essayTitle} by Paul Graham`,
+    `${languageName} Translation of ${essayTitle}`,
+    `Paul Graham's Essays in ${languageName}`,
+    `AI Translation - ${essayTitle} by Paul Graham`
+  ]
 
   return {
-    title: `${capitalise(rawShortTitle)} - ${languageName} - ${capitalise(model)}`,
-    description: `Paul Graham's ${capitalise(rawShortTitle)} in ${languageName} using ${capitalise(model)}`
+    title: `${essayTitle} - ${languageName}`,
+    description: `Read Paul Graham's ${essayTitle} translated into ${languageName} with ${modelName}. Explore insightful essays with high-quality translations.`,
+    authors: [{ name: "Paul Graham", url: "https://paulgraham.com" }],
+    creator: "fxn-m",
+    alternates: {
+      canonical: `https://paulgraham-translated.vercel.app/essays/${params.lang}/${rawShortTitle}/google-NMT`,
+      languages: supportedLanguages.reduce<Record<string, string>>((acc, lang) => {
+        const langCode = languageCodes[lang as keyof typeof languageCodes]
+
+        if (langCode) {
+          acc[langCode] = `https://paulgraham-translated.vercel.app/essays/${lang}/${rawShortTitle}/${model}`
+        }
+
+        return acc
+      }, {})
+    },
+    keywords
   }
 }
 

@@ -48,6 +48,7 @@ const FeedbackButton = ({ type, Icon, label, handleFeedback, isDisabled, count, 
 
   return (
     <button
+      id="feedback-button"
       className={clsx(
         "flex w-full items-center justify-between rounded-md px-3 py-2 transition-colors",
         !isDisabled && ["hover:bg-gray-100", "dark:hover:bg-slate-600", colorClasses[type].hoverTextColor],

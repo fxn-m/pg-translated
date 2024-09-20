@@ -6,13 +6,6 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
-export async function generateMetadata() {
-  return {
-    title: "404 - Not Found",
-    description: "This essay hasn't been written yet, not even by Paul Graham."
-  }
-}
-
 export default function NotFound() {
   const router = useRouter()
   return (
