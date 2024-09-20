@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: { params: { lang: string; slu
     authors: [{ name: "Paul Graham", url: "https://paulgraham.com" }],
     creator: "fxn-m",
     alternates: {
-      canonical: `https://paulgraham-translated.vercel.app/essays/${params.lang}/${rawShortTitle}/google-NMT`,
+      canonical: `https://paulgraham-translated.vercel.app/essays/${params.lang}/${rawShortTitle}/${model}`,
       languages: supportedLanguages.reduce<Record<string, string>>((acc, lang) => {
         const langCode = languageCodes[lang as keyof typeof languageCodes]
 
