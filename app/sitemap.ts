@@ -34,16 +34,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `https://paulgraham-translated.vercel.app/`,
       lastModified: new Date(),
       changeFrequency: "monthly",
-      priority: 1.0,
-      alternates: generateAlternates("")
+      priority: 1.0
     })
 
-    sitemapEntries.push({
-      url: `https://paulgraham-translated.vercel.app/essays`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.9,
-      alternates: generateAlternates("/essays")
+    supportedLanguages.forEach((language) => {
+      sitemapEntries.push({
+        url: `https://paulgraham-translated.vercel.app/?lang=${language}`,
+        lastModified: new Date(),
+        changeFrequency: "monthly",
+        priority: 0.9,
+        alternates: generateAlternates("")
+      })
+    })
+
+    supportedLanguages.forEach((language) => {
+      sitemapEntries.push({
+        url: `https://paulgraham-translated.vercel.app/essays/${language}`,
+        lastModified: new Date(),
+        changeFrequency: "weekly",
+        priority: 0.9,
+        alternates: generateAlternates("/essays")
+      })
     })
 
     essaysData.forEach((essay) => {
