@@ -1,6 +1,6 @@
 import { db } from "@/db"
 import { eq, and, isNull } from "drizzle-orm"
-import { essays, isSupportedLanguage } from "@/db/schema"
+import { essays, isSupportedLanguage, languageCodes } from "@/db/schema"
 import { type SupportedLanguage, supportedLanguages } from "@/db/schema"
 import Link from "next/link"
 import Error from "@/app/error"
@@ -28,6 +28,18 @@ export async function generateMetadata({ params }: { params: { lang: string } })
   return {
     title: `Paul Graham's ${capitalise(essaysTranslation)} - ${languageName}`,
     description: `Paul Graham's ${essaysTranslation} in ${languageName}`,
+    creator: "fxn-m",
+    alternates: {
+      languages: supportedLanguages.reduce<Record<string, string>>((acc, lang) => {
+        const langCode = languageCodes[lang as keyof typeof languageCodes]
+
+        if (langCode) {
+          acc[langCode] = `https://paulgraham-translated.vercel.app/essays/${lang}`
+        }
+
+        return acc
+      }, {})
+    },
     keywords
   }
 }

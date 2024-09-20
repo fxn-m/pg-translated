@@ -1,5 +1,7 @@
 import "./globals.css"
 
+import { languageCodes, supportedLanguages } from "@/db/schema"
+
 import { Analytics } from "@vercel/analytics/react"
 import { Inter } from "next/font/google"
 import LanguageSelector from "@/components/LanguageSelector"
@@ -38,6 +40,18 @@ export const metadata: Metadata = {
   title: "Paul Graham's Essays - Translated",
   description: "All of Paul Graham's essays, translated into multiple languages.",
   verification: { google: "Jyvg74NWOsKSbfvRJSDfH08HfQp-34IgOoL4823oQFM" },
+  alternates: {
+    canonical: "https://paulgraham-translated.vercel.app/",
+    languages: supportedLanguages.reduce<Record<string, string>>((acc, lang) => {
+      const langCode = languageCodes[lang as keyof typeof languageCodes]
+
+      if (langCode) {
+        acc[langCode] = `https://paulgraham-translated.vercel.app/?lang=${lang}`
+      }
+
+      return acc
+    }, {})
+  },
   keywords: ["Paul Graham Essays Translation", "Paul Graham Essays Translated", "Paul Graham Essays in Multiple Languages"]
 }
 
