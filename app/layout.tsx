@@ -42,9 +42,31 @@ export const metadata: Metadata = {
   creator: "fxn-m",
   openGraph: {
     title: "Paul Graham's Essays - Translated",
-    description: "All of Paul Graham's essays, translated into multiple languages.",
+    description: "Paul Graham's essays, translated into multiple languages.",
     type: "website",
-    locale: "en"
+    url: "https://paulgraham-translated.vercel.app/",
+    siteName: "Paul Graham's Essays - Translated",
+    images: [
+      {
+        url: "https://paulgraham-translated.vercel.app/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Paul Graham's Essays - Translated"
+      }
+    ]
+  },
+  twitter: {
+    title: "Paul Graham's Essays - Translated",
+    description: "Paul Graham's essays, translated into multiple languages.",
+    card: "summary_large_image",
+    images: [
+      {
+        url: "https://paulgraham-translated.vercel.app/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Paul Graham's Essays - Translated"
+      }
+    ]
   },
   verification: { google: "Jyvg74NWOsKSbfvRJSDfH08HfQp-34IgOoL4823oQFM" },
   alternates: {
