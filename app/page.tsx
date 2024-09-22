@@ -48,7 +48,7 @@ export default function Home() {
         <Link
           href="https://www.producthunt.com/posts/paul-graham-translated?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-paul&#0045;graham&#0045;translated"
           target="_blank"
-          className="flex w-full justify-end md:absolute md:bottom-4 md:right-4"
+          className="flex w-full justify-center md:absolute md:bottom-4 md:right-4 md:w-auto"
         >
           <Image
             className="dark:invert"
