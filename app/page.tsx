@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { Suspense } from "react"
 import { Typewriter } from "react-simple-typewriter"
@@ -59,6 +60,34 @@ export default function Home() {
           </p>
         </footer>
       </div>
+
+      <Link
+        href="https://www.producthunt.com/posts/paul-graham-translated?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-paul&#0045;graham&#0045;translated"
+        target="_blank"
+        className="absolute bottom-4 right-4"
+      >
+        <Image
+          className="dark:invert"
+          src={`https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=491133&theme=light`}
+          alt="Paul&#0032;Graham&#0032;Translated - 223&#0032;Essays&#0032;&#0045;&#0032;8&#0032;Languages&#0032;&#0045;&#0032;4&#0032;Translations | Product Hunt"
+          width="250"
+          height="54"
+          unoptimized
+        />
+      </Link>
     </Suspense>
   )
 }
+
+// ;<a
+//   href="https://www.producthunt.com/posts/paul-graham-translated?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-paul&#0045;graham&#0045;translated"
+//   target="_blank"
+// >
+//   <img
+//     src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=491133&theme=light"
+//     alt="Paul&#0032;Graham&#0032;Translated - 223&#0032;Essays&#0032;&#0045;&#0032;8&#0032;Languages&#0032;&#0045;&#0032;4&#0032;Translations | Product Hunt"
+//     style="width: 250px; height: 54px;"
+//     width="250"
+//     height="54"
+//   />
+// </a>
