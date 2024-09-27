@@ -9,7 +9,6 @@ import { languageData } from "@/lib/languageData"
 import { Metadata } from "next"
 
 export const revalidate = false
-export const dynamicParams = false
 
 export async function generateMetadata({ params }: { params: { lang: string } }): Promise<Metadata> {
   if (!isSupportedLanguage(params.lang)) {

@@ -19,7 +19,6 @@ import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
 
 export const revalidate = false
-export const dynamicParams = false
 
 export async function generateMetadata({ params }: { params: { lang: string; slug: string[] } }): Promise<Metadata> {
   const [rawShortTitle, model = "google-NMT"] = params.slug
