@@ -18,6 +18,8 @@ import { remark } from "remark"
 import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
 
+export const dynamic = "force-static"
+
 export async function generateMetadata({ params }: { params: { lang: string; slug: string[] } }): Promise<Metadata> {
   const [rawShortTitle, model = "google-NMT"] = params.slug
 
@@ -84,7 +86,6 @@ function ExternalLinkComponent({ short_title }: { short_title: string }) {
   )
 }
 
-// Return a list of `params` to populate the [slug] dynamic segment
 export async function generateStaticParams() {
   const essayPermutations = await db
     .select({

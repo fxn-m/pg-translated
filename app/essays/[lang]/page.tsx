@@ -8,6 +8,8 @@ import { capitalise } from "@/lib/utils"
 import { languageData } from "@/lib/languageData"
 import { Metadata } from "next"
 
+export const dynamic = "force-static"
+
 export async function generateMetadata({ params }: { params: { lang: string } }): Promise<Metadata> {
   if (!isSupportedLanguage(params.lang)) {
     return {
