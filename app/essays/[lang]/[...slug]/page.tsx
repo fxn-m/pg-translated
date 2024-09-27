@@ -18,7 +18,7 @@ import { remark } from "remark"
 import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
 
-export const dynamic = "force-static"
+export const revalidate = 60 * 60 * 365
 
 export async function generateMetadata({ params }: { params: { lang: string; slug: string[] } }): Promise<Metadata> {
   const [rawShortTitle, model = "google-NMT"] = params.slug
