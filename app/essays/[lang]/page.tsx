@@ -8,7 +8,8 @@ import { capitalise } from "@/lib/utils"
 import { languageData } from "@/lib/languageData"
 import { Metadata } from "next"
 
-export const revalidate = 60 * 60 * 365
+export const revalidate = false
+export const dynamicParams = false
 
 export async function generateMetadata({ params }: { params: { lang: string } }): Promise<Metadata> {
   if (!isSupportedLanguage(params.lang)) {
