@@ -143,8 +143,8 @@ export default async function Page({ params }: { params: { lang: string; slug: s
   const contentHtml = parsedContent.toString()
 
   return (
-    <div className="items-center justify-items-center pb-8 font-geistSans">
-      <main className="row-start-2 space-y-4 text-sm sm:items-start">
+    <div className="items-start justify-items-start pb-8 font-geistSans">
+      <main className="w-full space-y-4 text-sm sm:items-start">
         <div className="flex w-full flex-row justify-between">
           <div className="flex flex-col gap-4">
             <h1 className="text-xl">{essay.translated_title.toUpperCase()}</h1>
